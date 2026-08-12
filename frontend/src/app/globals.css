@@ -3,19 +3,25 @@
 :root {
   color-scheme: light;
   --background: #ffffff;
-  --foreground: #111111;
+  --foreground: #171717;
   --sidebar: #fafafa;
   --border: #e5e5e5;
+  --surface: #f5f5f5;
+  --muted: #9ca3af;
 
   --background-light: #ffffff;
-  --foreground-light: #111111;
+  --foreground-light: #171717;
   --sidebar-light: #fafafa;
   --border-light: #e5e5e5;
+  --surface-light: #f5f5f5;
+  --muted-light: #9ca3af;
 
   --background-dark: #0f0f0f;
   --foreground-dark: #f5f5f5;
   --sidebar-dark: #171717;
   --border-dark: #2a2a2a;
+  --surface-dark: #1f1f1f;
+  --muted-dark: #a1a1aa;
 }
 
 :root[data-theme="light"] {
@@ -24,6 +30,8 @@
   --foreground: var(--foreground-light);
   --sidebar: var(--sidebar-light);
   --border: var(--border-light);
+  --surface: var(--surface-light);
+  --muted: var(--muted-light);
 }
 
 :root[data-theme="dark"] {
@@ -32,6 +40,8 @@
   --foreground: var(--foreground-dark);
   --sidebar: var(--sidebar-dark);
   --border: var(--border-dark);
+  --surface: var(--surface-dark);
+  --muted: var(--muted-dark);
 }
 
 @theme inline {
@@ -39,6 +49,8 @@
   --color-foreground: var(--foreground);
   --color-sidebar: var(--sidebar);
   --color-border: var(--border);
+  --color-surface: var(--surface);
+  --color-muted: var(--muted);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
