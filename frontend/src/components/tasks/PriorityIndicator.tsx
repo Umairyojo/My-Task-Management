@@ -1,3 +1,5 @@
+"use client";
+
 import type { TaskPriority } from "./types";
 
 const priorityStyles: Record<

@@ -1,3 +1,5 @@
+"use client";
+
 import { Plus } from "lucide-react";
 import type { Task } from "./types";
 import { TaskRow } from "./TaskRow";

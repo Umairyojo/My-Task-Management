@@ -1,3 +1,5 @@
+"use client";
+
 import { ChevronDown } from "lucide-react";
 import type { Task } from "./types";
 import { TaskTable } from "./TaskTable";

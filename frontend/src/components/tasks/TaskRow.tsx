@@ -1,3 +1,5 @@
+"use client";
+
 import { MoreHorizontal } from "lucide-react";
 import type { Task } from "./types";
 import { MemberAvatar } from "./MemberAvatar";
