@@ -3,12 +3,15 @@
 import { MoreHorizontal } from "lucide-react";
 import type { Task } from "./types";
 import { MemberAvatar } from "./MemberAvatar";
+import { formatTaskDate } from "./task-date";
 
 interface TaskCardProps {
   task: Task;
 }
 
 export function TaskCard({ task }: TaskCardProps) {
+  const dueDate = formatTaskDate(task.dueDate);
+
   return (
     <article className="rounded-lg border border-border bg-background px-3 py-3">
       <div className="flex items-start justify-between gap-3">
@@ -26,10 +29,14 @@ export function TaskCard({ task }: TaskCardProps) {
       </div>
 
       <div className="mt-3 flex items-center justify-between gap-3">
-        <MemberAvatar member={task.member} showName />
+        <MemberAvatar
+          assigneeName={task.assigneeName}
+          assigneeInitials={task.assigneeInitials}
+          showName
+        />
 
         <span className="inline-flex shrink-0 items-center rounded-full border border-border bg-surface px-2 py-0.5 text-[11px] leading-4 text-muted">
-          {task.dueDate}
+          {dueDate ?? "-"}
         </span>
       </div>
 

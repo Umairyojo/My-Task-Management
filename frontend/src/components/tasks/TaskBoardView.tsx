@@ -1,8 +1,8 @@
 "use client";
 
-import { taskBoardSections } from "./mock-tasks";
 import type { Task } from "./types";
 import { TaskBoardColumn } from "./TaskBoardColumn";
+import { taskBoardSections } from "./task-sections";
 
 interface TaskBoardViewProps {
   tasks: Task[];

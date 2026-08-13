@@ -1,8 +1,8 @@
 "use client";
 
-import { taskListSections } from "./mock-tasks";
 import type { Task } from "./types";
 import { TaskSection } from "./TaskSection";
+import { taskListSections } from "./task-sections";
 
 interface TaskListViewProps {
   tasks: Task[];

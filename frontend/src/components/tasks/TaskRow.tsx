@@ -4,12 +4,15 @@ import { MoreHorizontal } from "lucide-react";
 import type { Task } from "./types";
 import { MemberAvatar } from "./MemberAvatar";
 import { PriorityIndicator } from "./PriorityIndicator";
+import { formatTaskDate } from "./task-date";
 
 interface TaskRowProps {
   task: Task;
 }
 
 export function TaskRow({ task }: TaskRowProps) {
+  const dueDate = formatTaskDate(task.dueDate);
+
   return (
     <tr className="border-t border-border first:border-t-0 hover:bg-surface/40">
       <td className="px-4 py-2.5 align-middle">
@@ -21,10 +24,15 @@ export function TaskRow({ task }: TaskRowProps) {
         <PriorityIndicator priority={task.priority} />
       </td>
       <td className="px-4 py-2.5 align-middle">
-        <MemberAvatar member={task.member} />
+        <MemberAvatar
+          assigneeName={task.assigneeName}
+          assigneeInitials={task.assigneeInitials}
+        />
       </td>
       <td className="px-4 py-2.5 align-middle">
-        <span className="text-[12px] leading-4 text-muted">{task.dueDate}</span>
+        <span className="text-[12px] leading-4 text-muted">
+          {dueDate ?? "-"}
+        </span>
       </td>
       <td className="px-4 py-2.5 align-middle text-right">
         <button

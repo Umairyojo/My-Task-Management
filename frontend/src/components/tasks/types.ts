@@ -4,28 +4,17 @@ export type TaskViewMode = "list" | "board";
 
 export type TaskPriority = "high" | "medium" | "low";
 
-export type TaskMember =
-  | {
-      kind: "person";
-      name: string;
-      initials: string;
-    }
-  | {
-      kind: "initials";
-      initials: string;
-    }
-  | {
-      kind: "add";
-    };
-
 export interface Task {
   id: string;
   title: string;
   status: TaskStatus;
   priority: TaskPriority;
-  member: TaskMember;
-  dueDate: string;
-  labels?: string[];
+  assigneeName: string | null;
+  assigneeInitials: string | null;
+  dueDate: string | null;
+  labels: string[];
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface TaskSectionModel {
