@@ -9,8 +9,8 @@ interface TaskSectionProps {
 
 export function TaskSection({ title, tasks }: TaskSectionProps) {
   return (
-    <section className="space-y-2.5">
-      <div className="flex h-8 items-center gap-1.5 rounded-md px-1 text-[13px] font-medium text-foreground">
+    <section className="space-y-1.5">
+      <div className="flex h-7 items-center gap-1.5 rounded-md px-1 text-[12px] font-medium text-foreground">
         <ChevronDown className="h-4 w-4 text-muted" aria-hidden="true" />
         <h2>{title}</h2>
       </div>

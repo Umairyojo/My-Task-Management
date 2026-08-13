@@ -3,7 +3,7 @@ import { ChevronDown, Filter, Search, Plus } from "lucide-react";
 export function TaskToolbar() {
   return (
     <div className="flex items-center justify-between gap-4">
-      <h1 className="text-[28px] font-semibold leading-none tracking-[-0.03em] text-foreground">
+      <h1 className="text-[20px] font-semibold leading-none tracking-[-0.02em] text-foreground">
         Tasks
       </h1>
 

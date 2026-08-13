@@ -17,22 +17,22 @@ export function Sidebar() {
 
   return (
     <aside className="flex w-64 shrink-0 flex-col border-r border-border bg-sidebar">
-      <div className="border-b border-border px-4 py-4">
-        <div className="flex items-center gap-2.5">
-          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-background text-[12px] font-semibold text-foreground ring-1 ring-border">
+      <div className="border-b border-border px-4 py-3">
+        <div className="flex items-center gap-2">
+          <div className="flex h-6 w-6 items-center justify-center rounded-md bg-background text-[11px] font-semibold text-foreground ring-1 ring-border">
             D
           </div>
           <div className="min-w-0">
-            <p className="truncate text-[13px] font-semibold leading-5 text-foreground">
+            <p className="truncate text-[12px] font-semibold leading-4 text-foreground">
               Dexter
             </p>
-            <p className="text-[11px] leading-4 text-muted">Workspace</p>
+            <p className="text-[10px] leading-4 text-muted">Workspace</p>
           </div>
         </div>
       </div>
 
-      <nav aria-label="Workspace" className="flex-1 px-3 py-3">
-        <p className="px-2 pb-2 text-[11px] font-medium leading-4 text-muted">
+      <nav aria-label="Workspace" className="flex-1 px-3 py-2.5">
+        <p className="px-2 pb-2 text-[10px] font-medium leading-4 text-muted">
           Workspace
         </p>
         <ul className="space-y-1">
