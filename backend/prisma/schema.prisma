@@ -1,0 +1,43 @@
+generator client {
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  engineType   = "client"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum TaskStatus {
+  TODO      @map("todo")
+  DOING     @map("doing")
+  COMPLETED @map("completed")
+  ON_HOLD  @map("on-hold")
+
+  @@map("task_status")
+}
+
+enum TaskPriority {
+  HIGH   @map("high")
+  MEDIUM @map("medium")
+  LOW    @map("low")
+
+  @@map("task_priority")
+}
+
+model Task {
+  id               String        @id @default(uuid()) @db.Uuid
+  title            String
+  status           TaskStatus    @default(TODO)
+  priority         TaskPriority
+  assigneeName     String?
+  assigneeInitials String?
+  dueDate          DateTime?
+  labels           String[]      @default([])
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+
+  @@index([status])
+  @@index([createdAt])
+}
