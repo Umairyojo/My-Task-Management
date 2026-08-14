@@ -1,15 +1,26 @@
 "use client";
 
 import { GripVertical, MoreHorizontal, Plus } from "lucide-react";
-import type { Task } from "./types";
+import type { Task, TaskStatus } from "./types";
 import { TaskCard } from "./TaskCard";
 
 interface TaskBoardColumnProps {
+  status: TaskStatus;
   title: string;
   tasks: Task[];
+  onAddTask: (status: TaskStatus) => void;
+  onEditTask: (task: Task) => void;
+  onDeleteTask: (task: Task) => void;
 }
 
-export function TaskBoardColumn({ title, tasks }: TaskBoardColumnProps) {
+export function TaskBoardColumn({
+  status,
+  title,
+  tasks,
+  onAddTask,
+  onEditTask,
+  onDeleteTask,
+}: TaskBoardColumnProps) {
   return (
     <section className="flex w-[289px] shrink-0 flex-col rounded-lg border border-border bg-surface">
       <header className="flex h-11 items-center justify-between gap-3 border-b border-border px-3">
@@ -23,6 +34,7 @@ export function TaskBoardColumn({ title, tasks }: TaskBoardColumnProps) {
         <div className="flex items-center gap-1">
           <button
             type="button"
+            onClick={() => onAddTask(status)}
             className="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted transition-colors hover:bg-background hover:text-foreground"
           >
             <Plus className="h-4 w-4" aria-hidden="true" />
@@ -40,7 +52,12 @@ export function TaskBoardColumn({ title, tasks }: TaskBoardColumnProps) {
 
       <div className="space-y-2 p-3">
         {tasks.map((task) => (
-          <TaskCard key={task.id} task={task} />
+          <TaskCard
+            key={task.id}
+            task={task}
+            onEditTask={onEditTask}
+            onDeleteTask={onDeleteTask}
+          />
         ))}
       </div>
     </section>

@@ -1,4 +1,14 @@
-import type { Task } from "@/components/tasks/types";
+import type { Task, TaskPriority, TaskStatus } from "@/components/tasks/types";
+
+export interface TaskWriteInput {
+  title: string;
+  status: TaskStatus;
+  priority: TaskPriority;
+  assigneeName: string;
+  assigneeInitials: string;
+  dueDate: string;
+  labels: string[];
+}
 
 function getApiBaseUrl(): string {
   const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
@@ -42,6 +52,50 @@ function isTask(value: unknown): value is Task {
   );
 }
 
+async function parseTaskResponse(
+  response: Response,
+  fallbackMessage: string,
+): Promise<Task> {
+  if (!response.ok) {
+    throw new Error(`${fallbackMessage} (${response.status}).`);
+  }
+
+  const data: unknown = await response.json();
+
+  if (!isTask(data)) {
+    throw new Error("Unexpected task response from the API.");
+  }
+
+  return data;
+}
+
+function buildTaskRequestBody(input: TaskWriteInput): Record<string, unknown> {
+  const body: Record<string, unknown> = {
+    title: input.title.trim(),
+    status: input.status,
+    priority: input.priority,
+    labels: input.labels.map((label) => label.trim()).filter(Boolean),
+  };
+
+  const assigneeName = input.assigneeName.trim();
+  const assigneeInitials = input.assigneeInitials.trim();
+  const dueDate = input.dueDate.trim();
+
+  if (assigneeName.length > 0) {
+    body.assigneeName = assigneeName;
+  }
+
+  if (assigneeInitials.length > 0) {
+    body.assigneeInitials = assigneeInitials.toUpperCase();
+  }
+
+  if (dueDate.length > 0) {
+    body.dueDate = dueDate;
+  }
+
+  return body;
+}
+
 export async function getTasks(): Promise<Task[]> {
   const response = await fetch(new URL("/tasks", getApiBaseUrl()).toString(), {
     cache: "no-store",
@@ -58,4 +112,41 @@ export async function getTasks(): Promise<Task[]> {
   }
 
   return data;
+}
+
+export async function createTask(input: TaskWriteInput): Promise<Task> {
+  const response = await fetch(new URL("/tasks", getApiBaseUrl()).toString(), {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(buildTaskRequestBody(input)),
+  });
+
+  return parseTaskResponse(response, "Unable to create task");
+}
+
+export async function updateTask(
+  id: string,
+  input: TaskWriteInput,
+): Promise<Task> {
+  const response = await fetch(new URL(`/tasks/${id}`, getApiBaseUrl()).toString(), {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(buildTaskRequestBody(input)),
+  });
+
+  return parseTaskResponse(response, "Unable to update task");
+}
+
+export async function deleteTask(id: string): Promise<void> {
+  const response = await fetch(new URL(`/tasks/${id}`, getApiBaseUrl()).toString(), {
+    method: "DELETE",
+  });
+
+  if (!response.ok) {
+    throw new Error(`Unable to delete task (${response.status}).`);
+  }
 }

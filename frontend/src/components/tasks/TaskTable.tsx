@@ -1,14 +1,24 @@
 "use client";
 
 import { Plus } from "lucide-react";
-import type { Task } from "./types";
+import type { Task, TaskStatus } from "./types";
 import { TaskRow } from "./TaskRow";
 
 interface TaskTableProps {
+  status: TaskStatus;
   tasks: Task[];
+  onAddTask: (status: TaskStatus) => void;
+  onEditTask: (task: Task) => void;
+  onDeleteTask: (task: Task) => void;
 }
 
-export function TaskTable({ tasks }: TaskTableProps) {
+export function TaskTable({
+  status,
+  tasks,
+  onAddTask,
+  onEditTask,
+  onDeleteTask,
+}: TaskTableProps) {
   return (
     <div className="overflow-hidden rounded-[10px] border border-border bg-background">
       <table className="min-w-full border-collapse">
@@ -23,7 +33,12 @@ export function TaskTable({ tasks }: TaskTableProps) {
         </thead>
         <tbody>
           {tasks.map((task) => (
-            <TaskRow key={task.id} task={task} />
+            <TaskRow
+              key={task.id}
+              task={task}
+              onEditTask={onEditTask}
+              onDeleteTask={onDeleteTask}
+            />
           ))}
         </tbody>
         <tfoot>
@@ -31,6 +46,7 @@ export function TaskTable({ tasks }: TaskTableProps) {
             <td colSpan={5} className="px-4 py-2.5">
               <button
                 type="button"
+                onClick={() => onAddTask(status)}
                 className="inline-flex items-center gap-1.5 text-[12px] font-medium text-muted transition-colors hover:text-foreground"
               >
                 <Plus className="h-4 w-4" aria-hidden="true" />

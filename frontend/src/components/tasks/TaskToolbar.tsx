@@ -15,6 +15,7 @@ import type { TaskViewMode } from "./types";
 interface TaskToolbarProps {
   viewMode: TaskViewMode;
   onViewModeChange: (viewMode: TaskViewMode) => void;
+  onAddTask: () => void;
 }
 
 const fieldOptions = [
@@ -29,6 +30,7 @@ const fieldOptions = [
 export function TaskToolbar({
   viewMode,
   onViewModeChange,
+  onAddTask,
 }: TaskToolbarProps) {
   const [isFieldsOpen, setIsFieldsOpen] = useState(false);
   const fieldsPanelRef = useRef<HTMLDivElement>(null);
@@ -153,6 +155,7 @@ export function TaskToolbar({
 
         <button
           type="button"
+          onClick={onAddTask}
           className="inline-flex h-8 items-center gap-1.5 rounded-[4px] bg-foreground px-3 text-[13px] font-medium text-background transition-colors hover:bg-zinc-800"
         >
           <Plus className="h-4 w-4" aria-hidden="true" />

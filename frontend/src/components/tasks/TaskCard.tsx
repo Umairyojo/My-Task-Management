@@ -1,15 +1,21 @@
 "use client";
 
-import { MoreHorizontal } from "lucide-react";
 import type { Task } from "./types";
 import { MemberAvatar } from "./MemberAvatar";
 import { formatTaskDate } from "./task-date";
+import { TaskActionsMenu } from "./TaskActionsMenu";
 
 interface TaskCardProps {
   task: Task;
+  onEditTask: (task: Task) => void;
+  onDeleteTask: (task: Task) => void;
 }
 
-export function TaskCard({ task }: TaskCardProps) {
+export function TaskCard({
+  task,
+  onEditTask,
+  onDeleteTask,
+}: TaskCardProps) {
   const dueDate = formatTaskDate(task.dueDate);
 
   return (
@@ -19,13 +25,11 @@ export function TaskCard({ task }: TaskCardProps) {
           {task.title}
         </h3>
 
-        <button
-          type="button"
-          className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-muted transition-colors hover:bg-surface hover:text-foreground"
-        >
-          <MoreHorizontal className="h-3.5 w-3.5" aria-hidden="true" />
-          <span className="sr-only">{task.title} actions</span>
-        </button>
+        <TaskActionsMenu
+          taskTitle={task.title}
+          onEdit={() => onEditTask(task)}
+          onDelete={() => onDeleteTask(task)}
+        />
       </div>
 
       <div className="mt-3 flex items-center justify-between gap-3">
