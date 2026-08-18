@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import Script from "next/script";
 import type { ReactNode } from "react";
 import "./globals.css";
+import { getColorModeBootstrapScript } from "@/components/layout/color-mode";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,7 +29,14 @@ export default function RootLayout({
     <html
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full`}
+      data-theme="light"
+      suppressHydrationWarning
     >
+      <head>
+        <Script id="theme-bootstrap" strategy="beforeInteractive">
+          {getColorModeBootstrapScript()}
+        </Script>
+      </head>
       <body className="min-h-dvh bg-background text-foreground antialiased">
         {children}
       </body>

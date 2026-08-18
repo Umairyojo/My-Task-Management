@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { ColorModeMenu } from "./ColorModeMenu";
 
 const navigationItems = [
   { href: "/tasks", label: "Tasks" },
@@ -18,16 +19,20 @@ export function Sidebar() {
   return (
     <aside className="flex w-64 shrink-0 flex-col border-r border-border bg-sidebar">
       <div className="border-b border-border px-4 py-3">
-        <div className="flex items-center gap-2">
-          <div className="flex h-6 w-6 items-center justify-center rounded-md bg-background text-[11px] font-semibold text-foreground ring-1 ring-border">
-            D
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <div className="flex h-6 w-6 items-center justify-center rounded-md bg-background text-[11px] font-semibold text-foreground ring-1 ring-border">
+              D
+            </div>
+            <div className="min-w-0">
+              <p className="truncate text-[12px] font-semibold leading-4 text-foreground">
+                Dexter
+              </p>
+              <p className="text-[10px] leading-4 text-muted">Workspace</p>
+            </div>
           </div>
-          <div className="min-w-0">
-            <p className="truncate text-[12px] font-semibold leading-4 text-foreground">
-              Dexter
-            </p>
-            <p className="text-[10px] leading-4 text-muted">Workspace</p>
-          </div>
+
+          <ColorModeMenu />
         </div>
       </div>
 

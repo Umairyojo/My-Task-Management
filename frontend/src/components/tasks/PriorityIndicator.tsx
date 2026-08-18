@@ -8,18 +8,18 @@ const priorityStyles: Record<
 > = {
   high: {
     label: "High",
-    badgeClassName: "bg-red-50 text-red-600 ring-red-100",
+    badgeClassName: "bg-red-500/10 text-red-600 ring-red-500/15",
     dotClassName: "bg-red-500",
   },
   medium: {
     label: "Medium",
-    badgeClassName: "bg-orange-50 text-orange-600 ring-orange-100",
+    badgeClassName: "bg-orange-500/10 text-orange-600 ring-orange-500/15",
     dotClassName: "bg-orange-500",
   },
   low: {
     label: "Low",
-    badgeClassName: "bg-zinc-100 text-zinc-500 ring-zinc-200",
-    dotClassName: "bg-zinc-400",
+    badgeClassName: "bg-zinc-500/10 text-zinc-500 ring-zinc-500/15",
+    dotClassName: "bg-zinc-400 dark:bg-zinc-300",
   },
 };
 
