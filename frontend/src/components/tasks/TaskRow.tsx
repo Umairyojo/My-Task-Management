@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import type { Task } from "./types";
 import { MemberAvatar } from "./MemberAvatar";
 import { PriorityIndicator } from "./PriorityIndicator";
@@ -27,9 +28,12 @@ export function TaskRow({
   return (
     <tr className="border-t border-border first:border-t-0 hover:bg-surface/40">
       <td className="px-4 py-2.5 align-middle">
-        <span className="block truncate text-[12px] font-medium leading-4 text-foreground">
+        <Link
+          href={`/tasks/${task.id}`}
+          className="block truncate text-[12px] font-medium leading-4 text-foreground transition-colors hover:text-muted"
+        >
           {task.title}
-        </span>
+        </Link>
       </td>
       {fieldVisibility.priority ? (
         <td className="px-4 py-2.5 align-middle">
@@ -45,7 +49,7 @@ export function TaskRow({
         </td>
       ) : null}
       {fieldVisibility.dueDate ? (
-        <td className="px-4 py-2.5 align-middle">
+        <td className="px-4 py-2.5 align-middle whitespace-nowrap">
           <span className="text-[12px] leading-4 text-muted">
             {dueDate ?? "-"}
           </span>
@@ -70,8 +74,8 @@ export function TaskRow({
         </td>
       ) : null}
       {fieldVisibility.status ? (
-        <td className="px-4 py-2.5 align-middle">
-          <span className="inline-flex items-center rounded-full border border-border bg-surface px-2 py-0.5 text-[11px] leading-4 text-muted">
+        <td className="px-4 py-2.5 align-middle whitespace-nowrap">
+          <span className="inline-flex items-center whitespace-nowrap rounded-full border border-border bg-surface px-2 py-0.5 text-[11px] leading-4 text-muted">
             {sectionTitle}
           </span>
         </td>

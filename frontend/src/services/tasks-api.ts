@@ -1,5 +1,15 @@
 import type { Task, TaskPriority, TaskStatus } from "@/components/tasks/types";
 
+export class TaskApiError extends Error {
+  status: number;
+
+  constructor(message: string, status: number) {
+    super(message);
+    this.name = "TaskApiError";
+    this.status = status;
+  }
+}
+
 export interface TaskWriteInput {
   title: string;
   status: TaskStatus;
@@ -49,7 +59,7 @@ async function parseTaskResponse(
   fallbackMessage: string,
 ): Promise<Task> {
   if (!response.ok) {
-    throw new Error(`${fallbackMessage} (${response.status}).`);
+    throw new TaskApiError(`${fallbackMessage} (${response.status}).`, response.status);
   }
 
   const data: unknown = await response.json();
@@ -104,6 +114,14 @@ export async function getTasks(): Promise<Task[]> {
   }
 
   return data;
+}
+
+export async function getTask(id: string): Promise<Task> {
+  const response = await fetch(getTasksApiUrl(`/${id}`), {
+    cache: "no-store",
+  });
+
+  return parseTaskResponse(response, "Unable to load task");
 }
 
 export async function createTask(input: TaskWriteInput): Promise<Task> {

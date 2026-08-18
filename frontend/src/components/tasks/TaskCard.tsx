@@ -1,5 +1,7 @@
 "use client";
 
+import { type KeyboardEvent } from "react";
+import { useRouter } from "next/navigation";
 import type { Task } from "./types";
 import type { TaskFieldVisibility } from "./task-fields";
 import { PriorityIndicator } from "./PriorityIndicator";
@@ -23,19 +25,42 @@ export function TaskCard({
   fieldVisibility,
 }: TaskCardProps) {
   const dueDate = formatTaskDate(task.dueDate);
+  const router = useRouter();
+  const detailHref = `/tasks/${task.id}`;
+
+  const handleOpenDetail = () => {
+    router.push(detailHref);
+  };
+
+  const handleKeyDown = (event: KeyboardEvent<HTMLElement>) => {
+    if (event.key !== "Enter" && event.key !== " ") {
+      return;
+    }
+
+    event.preventDefault();
+    handleOpenDetail();
+  };
 
   return (
-    <article className="rounded-lg border border-border bg-background px-3 py-3">
+    <article
+      role="link"
+      tabIndex={0}
+      onClick={handleOpenDetail}
+      onKeyDown={handleKeyDown}
+      className="cursor-pointer rounded-lg border border-border bg-background px-3 py-3 outline-none transition-colors hover:border-foreground/20 hover:bg-surface/40 focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+    >
       <div className="flex items-start justify-between gap-3">
         <h3 className="min-w-0 flex-1 text-[12px] font-medium leading-4 text-foreground">
           {task.title}
         </h3>
 
-        <TaskActionsMenu
-          taskTitle={task.title}
-          onEdit={() => onEditTask(task)}
-          onDelete={() => onDeleteTask(task)}
-        />
+        <div onClick={(event) => event.stopPropagation()}>
+          <TaskActionsMenu
+            taskTitle={task.title}
+            onEdit={() => onEditTask(task)}
+            onDelete={() => onDeleteTask(task)}
+          />
+        </div>
       </div>
 
       {fieldVisibility.priority || fieldVisibility.status ? (
@@ -44,7 +69,7 @@ export function TaskCard({
             <PriorityIndicator priority={task.priority} />
           ) : null}
           {fieldVisibility.status ? (
-            <span className="inline-flex items-center rounded-full border border-border bg-surface px-2 py-0.5 text-[11px] leading-4 text-muted">
+            <span className="inline-flex items-center whitespace-nowrap rounded-full border border-border bg-surface px-2 py-0.5 text-[11px] leading-4 text-muted">
               {statusLabel}
             </span>
           ) : null}
@@ -69,7 +94,7 @@ export function TaskCard({
           ) : null}
 
           {fieldVisibility.dueDate ? (
-            <span className="inline-flex shrink-0 items-center rounded-full border border-border bg-surface px-2 py-0.5 text-[11px] leading-4 text-muted">
+            <span className="inline-flex shrink-0 items-center whitespace-nowrap rounded-full border border-border bg-surface px-2 py-0.5 text-[11px] leading-4 text-muted">
               {dueDate ?? "-"}
             </span>
           ) : null}
