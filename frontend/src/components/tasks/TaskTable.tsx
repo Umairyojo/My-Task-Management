@@ -2,32 +2,58 @@
 
 import { Plus } from "lucide-react";
 import type { Task, TaskStatus } from "./types";
+import type { TaskFieldVisibility } from "./task-fields";
 import { TaskRow } from "./TaskRow";
 
 interface TaskTableProps {
   status: TaskStatus;
+  sectionTitle: string;
   tasks: Task[];
   onAddTask: (status: TaskStatus) => void;
   onEditTask: (task: Task) => void;
   onDeleteTask: (task: Task) => void;
+  fieldVisibility: TaskFieldVisibility;
 }
 
 export function TaskTable({
   status,
+  sectionTitle,
   tasks,
   onAddTask,
   onEditTask,
   onDeleteTask,
+  fieldVisibility,
 }: TaskTableProps) {
+  const visibleColumnCount =
+    1 +
+    (fieldVisibility.priority ? 1 : 0) +
+    (fieldVisibility.members ? 1 : 0) +
+    (fieldVisibility.dueDate ? 1 : 0) +
+    (fieldVisibility.labels ? 1 : 0) +
+    (fieldVisibility.status ? 1 : 0) +
+    1;
+
   return (
     <div className="overflow-hidden rounded-[10px] border border-border bg-background">
       <table className="min-w-full border-collapse">
         <thead className="bg-surface">
           <tr className="text-left text-[11px] font-medium text-muted">
             <th className="w-[46%] px-4 py-2 font-medium">Task</th>
-            <th className="w-[16%] px-4 py-2 font-medium">Priority</th>
-            <th className="w-[18%] px-4 py-2 font-medium">Members</th>
-            <th className="w-[14%] px-4 py-2 font-medium">Due Date</th>
+            {fieldVisibility.priority ? (
+              <th className="w-[12%] px-4 py-2 font-medium">Priority</th>
+            ) : null}
+            {fieldVisibility.members ? (
+              <th className="w-[16%] px-4 py-2 font-medium">Members</th>
+            ) : null}
+            {fieldVisibility.dueDate ? (
+              <th className="w-[12%] px-4 py-2 font-medium">Due Date</th>
+            ) : null}
+            {fieldVisibility.labels ? (
+              <th className="w-[14%] px-4 py-2 font-medium">Labels</th>
+            ) : null}
+            {fieldVisibility.status ? (
+              <th className="w-[10%] px-4 py-2 font-medium">Status</th>
+            ) : null}
             <th className="w-[6%] px-4 py-2 font-medium text-right">Actions</th>
           </tr>
         </thead>
@@ -36,14 +62,16 @@ export function TaskTable({
             <TaskRow
               key={task.id}
               task={task}
+              sectionTitle={sectionTitle}
               onEditTask={onEditTask}
               onDeleteTask={onDeleteTask}
+              fieldVisibility={fieldVisibility}
             />
           ))}
         </tbody>
         <tfoot>
           <tr className="border-t border-border">
-            <td colSpan={5} className="px-4 py-2.5">
+            <td colSpan={visibleColumnCount} className="px-4 py-2.5">
               <button
                 type="button"
                 onClick={() => onAddTask(status)}

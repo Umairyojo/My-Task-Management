@@ -1,6 +1,7 @@
 "use client";
 
 import type { Task, TaskStatus } from "./types";
+import type { TaskFieldVisibility } from "./task-fields";
 import { TaskBoardColumn } from "./TaskBoardColumn";
 import { taskBoardSections } from "./task-sections";
 
@@ -10,6 +11,7 @@ interface TaskBoardViewProps {
   onEditTask: (task: Task) => void;
   onDeleteTask: (task: Task) => void;
   hideEmptySections?: boolean;
+  fieldVisibility: TaskFieldVisibility;
 }
 
 export function TaskBoardView({
@@ -18,6 +20,7 @@ export function TaskBoardView({
   onEditTask,
   onDeleteTask,
   hideEmptySections = false,
+  fieldVisibility,
 }: TaskBoardViewProps) {
   return (
     <div className="min-h-0 min-w-0 overflow-x-auto pb-1">
@@ -38,6 +41,7 @@ export function TaskBoardView({
               onAddTask={onAddTask}
               onEditTask={onEditTask}
               onDeleteTask={onDeleteTask}
+              fieldVisibility={fieldVisibility}
             />
           );
         })}

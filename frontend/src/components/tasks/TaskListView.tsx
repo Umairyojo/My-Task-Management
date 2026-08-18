@@ -1,6 +1,7 @@
 "use client";
 
 import type { Task, TaskStatus } from "./types";
+import type { TaskFieldVisibility } from "./task-fields";
 import { TaskSection } from "./TaskSection";
 import { taskListSections } from "./task-sections";
 
@@ -10,6 +11,7 @@ interface TaskListViewProps {
   onEditTask: (task: Task) => void;
   onDeleteTask: (task: Task) => void;
   hideEmptySections?: boolean;
+  fieldVisibility: TaskFieldVisibility;
 }
 
 export function TaskListView({
@@ -18,6 +20,7 @@ export function TaskListView({
   onEditTask,
   onDeleteTask,
   hideEmptySections = false,
+  fieldVisibility,
 }: TaskListViewProps) {
   return (
     <div className="flex min-h-0 min-w-0 flex-1 flex-col">
@@ -33,15 +36,16 @@ export function TaskListView({
             return (
               <TaskSection
                 key={section.key}
-                status={section.key}
-                title={section.title}
-                tasks={sectionTasks}
-                onAddTask={onAddTask}
-                onEditTask={onEditTask}
-                onDeleteTask={onDeleteTask}
-              />
-            );
-          })}
+              status={section.key}
+              title={section.title}
+              tasks={sectionTasks}
+              onAddTask={onAddTask}
+              onEditTask={onEditTask}
+              onDeleteTask={onDeleteTask}
+              fieldVisibility={fieldVisibility}
+            />
+          );
+        })}
         </div>
       </div>
     </div>

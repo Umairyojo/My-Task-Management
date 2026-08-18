@@ -2,6 +2,7 @@
 
 import { ChevronDown } from "lucide-react";
 import type { Task, TaskStatus } from "./types";
+import type { TaskFieldVisibility } from "./task-fields";
 import { TaskTable } from "./TaskTable";
 
 interface TaskSectionProps {
@@ -11,6 +12,7 @@ interface TaskSectionProps {
   onAddTask: (status: TaskStatus) => void;
   onEditTask: (task: Task) => void;
   onDeleteTask: (task: Task) => void;
+  fieldVisibility: TaskFieldVisibility;
 }
 
 export function TaskSection({
@@ -20,6 +22,7 @@ export function TaskSection({
   onAddTask,
   onEditTask,
   onDeleteTask,
+  fieldVisibility,
 }: TaskSectionProps) {
   return (
     <section className="space-y-1.5">
@@ -29,10 +32,12 @@ export function TaskSection({
       </div>
       <TaskTable
         status={status}
+        sectionTitle={title}
         tasks={tasks}
         onAddTask={onAddTask}
         onEditTask={onEditTask}
         onDeleteTask={onDeleteTask}
+        fieldVisibility={fieldVisibility}
       />
     </section>
   );

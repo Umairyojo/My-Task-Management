@@ -18,6 +18,14 @@ interface TasksEmptyStateProps {
   onAction?: () => void;
 }
 
+interface TasksNoMatchStateProps {
+  message: string;
+  actions: Array<{
+    label: string;
+    onAction: () => void;
+  }>;
+}
+
 function ListSkeleton() {
   return (
     <div className="flex w-full min-w-[760px] flex-col gap-3">
@@ -158,6 +166,31 @@ export function TasksErrorState({ onRetry }: TasksErrorStateProps) {
             <RefreshCcw className="h-3.5 w-3.5" aria-hidden="true" />
             Retry
           </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function TasksNoMatchState({
+  message,
+  actions,
+}: TasksNoMatchStateProps) {
+  return (
+    <div className="flex min-h-0 min-w-0 flex-1 items-start pt-6">
+      <div className="rounded-lg border border-border bg-surface px-4 py-3 text-[13px] text-muted">
+        <p>{message}</p>
+        <div className="mt-3 flex flex-wrap gap-2">
+          {actions.map((action) => (
+            <button
+              key={action.label}
+              type="button"
+              onClick={action.onAction}
+              className="inline-flex h-8 items-center rounded-[4px] border border-border bg-background px-3 text-[12px] font-medium text-foreground transition-colors hover:bg-surface"
+            >
+              {action.label}
+            </button>
+          ))}
         </div>
       </div>
     </div>

@@ -2,6 +2,7 @@
 
 import { GripVertical, MoreHorizontal, Plus } from "lucide-react";
 import type { Task, TaskStatus } from "./types";
+import type { TaskFieldVisibility } from "./task-fields";
 import { TaskCard } from "./TaskCard";
 
 interface TaskBoardColumnProps {
@@ -11,6 +12,7 @@ interface TaskBoardColumnProps {
   onAddTask: (status: TaskStatus) => void;
   onEditTask: (task: Task) => void;
   onDeleteTask: (task: Task) => void;
+  fieldVisibility: TaskFieldVisibility;
 }
 
 export function TaskBoardColumn({
@@ -20,6 +22,7 @@ export function TaskBoardColumn({
   onAddTask,
   onEditTask,
   onDeleteTask,
+  fieldVisibility,
 }: TaskBoardColumnProps) {
   return (
     <section className="flex w-[289px] shrink-0 flex-col rounded-lg border border-border bg-surface">
@@ -55,8 +58,10 @@ export function TaskBoardColumn({
           <TaskCard
             key={task.id}
             task={task}
+            statusLabel={title}
             onEditTask={onEditTask}
             onDeleteTask={onDeleteTask}
+            fieldVisibility={fieldVisibility}
           />
         ))}
       </div>

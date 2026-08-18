@@ -1,7 +1,9 @@
 "use client";
 
 import {
+  type Dispatch,
   type KeyboardEvent,
+  type SetStateAction,
   useEffect,
   useRef,
   useState,
@@ -16,6 +18,11 @@ import {
   Search,
   X,
 } from "lucide-react";
+import { TaskFiltersPopover } from "./TaskFiltersPopover";
+import { countActiveTaskFilterCategories } from "./task-filters";
+import type { TaskFilterOptions, TaskFilters } from "./task-filters";
+import { taskFieldOptions } from "./task-fields";
+import type { TaskFieldVisibility } from "./task-fields";
 import type { TaskViewMode } from "./types";
 
 interface TaskToolbarProps {
@@ -27,23 +34,20 @@ interface TaskToolbarProps {
   onSearchOpenChange: (open: boolean) => void;
   onSearchQueryChange: (query: string) => void;
   onClearSearch: () => void;
+  filters: TaskFilters;
+  filterOptions: TaskFilterOptions;
+  onFiltersChange: Dispatch<SetStateAction<TaskFilters>>;
+  onClearFilters: () => void;
+  fieldVisibility: TaskFieldVisibility;
+  onFieldVisibilityChange: Dispatch<SetStateAction<TaskFieldVisibility>>;
 }
-
-const fieldOptions = [
-  { label: "Priority", checked: true },
-  { label: "Members", checked: true },
-  { label: "Due Date", checked: true },
-  { label: "Labels", checked: true },
-  { label: "Status", checked: true },
-  { label: "Reporter", checked: false },
-] as const;
 
 function getKeyboardHint() {
   if (typeof navigator === "undefined") {
     return "Ctrl+F";
   }
 
-  return /Mac|iPhone|iPad|iPod/.test(navigator.platform) ? "⌘F" : "Ctrl+F";
+  return /Mac|iPhone|iPad|iPod/.test(navigator.platform) ? "Cmd+F" : "Ctrl+F";
 }
 
 export function TaskToolbar({
@@ -55,12 +59,22 @@ export function TaskToolbar({
   onSearchOpenChange,
   onSearchQueryChange,
   onClearSearch,
+  filters,
+  filterOptions,
+  onFiltersChange,
+  onClearFilters,
+  fieldVisibility,
+  onFieldVisibilityChange,
 }: TaskToolbarProps) {
   const [isFieldsOpen, setIsFieldsOpen] = useState(false);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
   const fieldsPanelRef = useRef<HTMLDivElement>(null);
+  const filterButtonRef = useRef<HTMLButtonElement>(null);
   const searchPanelRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const hasSearchQuery = searchQuery.trim().length > 0;
+  const activeFilterCount = countActiveTaskFilterCategories(filters);
+  const hasActiveFilters = activeFilterCount > 0;
   const keyboardHint = getKeyboardHint();
 
   useEffect(() => {
@@ -121,9 +135,7 @@ export function TaskToolbar({
     };
   }, [hasSearchQuery, isSearchOpen, onSearchOpenChange]);
 
-  const handleSearchInputKeyDown = (
-    event: KeyboardEvent<HTMLInputElement>,
-  ) => {
+  const handleSearchInputKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
     if (event.key !== "Escape") {
       return;
     }
@@ -134,6 +146,11 @@ export function TaskToolbar({
 
     event.preventDefault();
     onSearchOpenChange(false);
+  };
+
+  const handleFilterButtonClick = () => {
+    setIsFieldsOpen(false);
+    setIsFilterOpen((current) => !current);
   };
 
   return (
@@ -196,7 +213,10 @@ export function TaskToolbar({
             type="button"
             aria-expanded={isFieldsOpen}
             aria-haspopup="dialog"
-            onClick={() => setIsFieldsOpen((current) => !current)}
+            onClick={() => {
+              setIsFilterOpen(false);
+              setIsFieldsOpen((current) => !current);
+            }}
             className="inline-flex h-8 items-center gap-1.5 rounded-[4px] border border-border bg-background px-3 text-[13px] font-medium text-foreground transition-colors hover:bg-surface"
           >
             <span>Fields</span>
@@ -239,41 +259,79 @@ export function TaskToolbar({
               </div>
 
               <div className="mt-3 space-y-1">
-                {fieldOptions.map((option) => (
-                  <div
-                    key={option.label}
-                    className="flex h-8 items-center justify-between rounded-md px-2 text-[12px] text-foreground hover:bg-surface"
-                  >
-                    <span>{option.label}</span>
-                    <span
-                      className={[
-                        "inline-flex h-4 w-4 items-center justify-center rounded-[3px] border",
-                        option.checked
-                          ? "border-foreground bg-foreground text-background"
-                          : "border-border bg-background text-transparent",
-                      ].join(" ")}
+                {taskFieldOptions.map((option) => {
+                  const checked = fieldVisibility[option.key];
+
+                  return (
+                    <button
+                      key={option.key}
+                      type="button"
+                      aria-pressed={checked}
+                      onClick={() =>
+                        onFieldVisibilityChange((current) => ({
+                          ...current,
+                          [option.key]: !current[option.key],
+                        }))
+                      }
+                      className="flex h-8 w-full items-center justify-between rounded-md px-2 text-[12px] text-foreground transition-colors hover:bg-surface"
                     >
-                      <Check className="h-3 w-3" aria-hidden="true" />
-                    </span>
-                  </div>
-                ))}
+                      <span>{option.label}</span>
+                      <span
+                        className={[
+                          "inline-flex h-4 w-4 items-center justify-center rounded-[3px] border",
+                          checked
+                            ? "border-foreground bg-foreground text-background"
+                            : "border-border bg-background text-transparent",
+                        ].join(" ")}
+                      >
+                        <Check className="h-3 w-3" aria-hidden="true" />
+                      </span>
+                    </button>
+                  );
+                })}
               </div>
             </div>
           ) : null}
         </div>
 
-        <button
-          type="button"
-          className="inline-flex h-8 w-8 items-center justify-center rounded-[4px] border border-border bg-background text-muted transition-colors hover:bg-surface hover:text-foreground"
-        >
-          <Filter className="h-4 w-4" aria-hidden="true" />
-          <span className="sr-only">Filter</span>
-        </button>
+        <div className="relative">
+          <button
+            ref={filterButtonRef}
+            type="button"
+            onClick={handleFilterButtonClick}
+            aria-label="Filter tasks"
+            aria-haspopup="dialog"
+            aria-expanded={isFilterOpen}
+            className={[
+              "relative inline-flex h-8 w-8 items-center justify-center rounded-[4px] border transition-colors",
+              hasActiveFilters
+                ? "border-border bg-surface text-foreground"
+                : "border-border bg-background text-muted hover:bg-surface hover:text-foreground",
+            ].join(" ")}
+          >
+            <Filter className="h-4 w-4" aria-hidden="true" />
+            {hasActiveFilters ? (
+              <span className="absolute -right-1 -top-1 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-foreground px-1 text-[10px] font-medium leading-none text-background">
+                {activeFilterCount}
+              </span>
+            ) : null}
+          </button>
+
+          <TaskFiltersPopover
+            open={isFilterOpen}
+            anchorRef={filterButtonRef}
+            filters={filters}
+            options={filterOptions}
+            onClose={() => setIsFilterOpen(false)}
+            onFiltersChange={onFiltersChange}
+            onClearFilters={onClearFilters}
+          />
+        </div>
 
         <button
           type="button"
           onClick={onAddTask}
-          className="inline-flex h-8 items-center gap-1.5 rounded-[4px] bg-foreground px-3 text-[13px] font-medium text-background transition-colors hover:bg-zinc-800"
+          className="inline-flex h-8 items-center gap-1.5 rounded-[4px] border border-border bg-foreground px-3 text-[13px] font-medium text-background transition-colors hover:opacity-90"
         >
           <Plus className="h-4 w-4" aria-hidden="true" />
           <span>Add Task</span>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { Task, TaskStatus, TaskViewMode } from "./types";
 import { TaskBoardView } from "./TaskBoardView";
 import { TaskDeleteDialog } from "./TaskDeleteDialog";
@@ -12,6 +12,17 @@ import {
   taskMatchesSearch,
 } from "./task-search";
 import {
+  defaultTaskFilters,
+  getTaskFilterOptions,
+  hasActiveTaskFilters,
+  taskMatchesTaskFilters,
+  type TaskFilters,
+} from "./task-filters";
+import {
+  defaultTaskFieldVisibility,
+  type TaskFieldVisibility,
+} from "./task-fields";
+import {
   createTask,
   deleteTask,
   getTasks,
@@ -22,6 +33,7 @@ import {
   TasksEmptyState,
   TasksErrorState,
   TasksLoadingState,
+  TasksNoMatchState,
 } from "./TasksStates";
 
 type TaskFormState =
@@ -52,16 +64,29 @@ export function TasksView() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [filters, setFilters] = useState<TaskFilters>(defaultTaskFilters);
+  const [fieldVisibility, setFieldVisibility] = useState<TaskFieldVisibility>(
+    defaultTaskFieldVisibility,
+  );
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
   const [taskFormState, setTaskFormState] = useState<TaskFormState | null>(null);
   const [deleteTaskTarget, setDeleteTaskTarget] = useState<Task | null>(null);
   const requestIdRef = useRef(0);
 
+  const filterOptions = useMemo(() => getTaskFilterOptions(tasks), [tasks]);
   const normalizedSearchQuery = normalizeTaskSearchQuery(searchQuery);
   const hasSearchQuery = normalizedSearchQuery.length > 0;
-  const filteredTasks = hasSearchQuery
-    ? tasks.filter((task) => taskMatchesSearch(task, normalizedSearchQuery))
-    : tasks;
+  const hasActiveFilters = hasActiveTaskFilters(filters);
+  const visibleTasks = useMemo(
+    () =>
+      tasks.filter(
+        (task) =>
+          taskMatchesSearch(task, normalizedSearchQuery) &&
+          taskMatchesTaskFilters(task, filters),
+      ),
+    [filters, normalizedSearchQuery, tasks],
+  );
+  const isCriteriaActive = hasSearchQuery || hasActiveFilters;
 
   const loadTasks = useCallback(async () => {
     const requestId = requestIdRef.current + 1;
@@ -120,6 +145,10 @@ export function TasksView() {
   const handleClearSearch = useCallback(() => {
     setSearchQuery("");
     setIsSearchOpen(false);
+  }, []);
+
+  const handleClearFilters = useCallback(() => {
+    setFilters(defaultTaskFilters);
   }, []);
 
   const handleTaskFormSubmit = useCallback(
@@ -211,35 +240,55 @@ export function TasksView() {
         onSearchOpenChange={handleSearchOpenChange}
         onSearchQueryChange={handleSearchQueryChange}
         onClearSearch={handleClearSearch}
+        filters={filters}
+        filterOptions={filterOptions}
+        onFiltersChange={setFilters}
+        onClearFilters={handleClearFilters}
+        fieldVisibility={fieldVisibility}
+        onFieldVisibilityChange={setFieldVisibility}
       />
 
       {status === "loading" ? (
         <TasksLoadingState viewMode={viewMode} />
       ) : status === "error" ? (
         <TasksErrorState onRetry={() => void loadTasks()} />
+      ) : isCriteriaActive && visibleTasks.length === 0 ? (
+        <TasksNoMatchState
+          message={
+            hasSearchQuery && hasActiveFilters
+              ? "No tasks match your search and filters."
+              : hasSearchQuery
+                ? "No tasks match your search."
+                : "No tasks match your current filters."
+          }
+          actions={[
+            ...(hasSearchQuery
+              ? [{ label: "Clear search", onAction: handleClearSearch }]
+              : []),
+            ...(hasActiveFilters
+              ? [{ label: "Clear filters", onAction: handleClearFilters }]
+              : []),
+          ]}
+        />
       ) : tasks.length === 0 ? (
         <TasksEmptyState />
-      ) : hasSearchQuery && filteredTasks.length === 0 ? (
-        <TasksEmptyState
-          message="No tasks match your search."
-          actionLabel="Clear Search"
-          onAction={handleClearSearch}
-        />
       ) : viewMode === "list" ? (
         <TaskListView
-          tasks={filteredTasks}
+          tasks={visibleTasks}
           onAddTask={openCreateTask}
           onEditTask={openEditTask}
           onDeleteTask={openDeleteTask}
-          hideEmptySections={hasSearchQuery}
+          hideEmptySections={isCriteriaActive}
+          fieldVisibility={fieldVisibility}
         />
       ) : (
         <TaskBoardView
-          tasks={filteredTasks}
+          tasks={visibleTasks}
           onAddTask={openCreateTask}
           onEditTask={openEditTask}
           onDeleteTask={openDeleteTask}
-          hideEmptySections={hasSearchQuery}
+          hideEmptySections={isCriteriaActive}
+          fieldVisibility={fieldVisibility}
         />
       )}
 
