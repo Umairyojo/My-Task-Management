@@ -8,6 +8,10 @@ import { TaskFormDialog, type TaskFormValues } from "./TaskFormDialog";
 import { TaskListView } from "./TaskListView";
 import { TaskToolbar } from "./TaskToolbar";
 import {
+  normalizeTaskSearchQuery,
+  taskMatchesSearch,
+} from "./task-search";
+import {
   createTask,
   deleteTask,
   getTasks,
@@ -46,10 +50,18 @@ function toTaskWriteInput(values: TaskFormValues): TaskWriteInput {
 export function TasksView() {
   const [viewMode, setViewMode] = useState<TaskViewMode>("list");
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
   const [taskFormState, setTaskFormState] = useState<TaskFormState | null>(null);
   const [deleteTaskTarget, setDeleteTaskTarget] = useState<Task | null>(null);
   const requestIdRef = useRef(0);
+
+  const normalizedSearchQuery = normalizeTaskSearchQuery(searchQuery);
+  const hasSearchQuery = normalizedSearchQuery.length > 0;
+  const filteredTasks = hasSearchQuery
+    ? tasks.filter((task) => taskMatchesSearch(task, normalizedSearchQuery))
+    : tasks;
 
   const loadTasks = useCallback(async () => {
     const requestId = requestIdRef.current + 1;
@@ -94,6 +106,20 @@ export function TasksView() {
 
   const closeDeleteTask = useCallback(() => {
     setDeleteTaskTarget(null);
+  }, []);
+
+  const handleSearchOpenChange = useCallback((open: boolean) => {
+    setIsSearchOpen(open);
+  }, []);
+
+  const handleSearchQueryChange = useCallback((query: string) => {
+    setSearchQuery(query);
+    setIsSearchOpen(true);
+  }, []);
+
+  const handleClearSearch = useCallback(() => {
+    setSearchQuery("");
+    setIsSearchOpen(false);
   }, []);
 
   const handleTaskFormSubmit = useCallback(
@@ -142,12 +168,49 @@ export function TasksView() {
     };
   }, [loadTasks]);
 
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key.toLowerCase() !== "f" || (!event.metaKey && !event.ctrlKey)) {
+        return;
+      }
+
+      const target = event.target;
+
+      if (!(target instanceof HTMLElement)) {
+        return;
+      }
+
+      const isSearchInput = target.closest("[data-task-search-input='true']");
+      const isEditableField = target.closest(
+        "input, textarea, select, [contenteditable='true']",
+      );
+
+      if (isEditableField && !isSearchInput) {
+        return;
+      }
+
+      event.preventDefault();
+      setIsSearchOpen(true);
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
+
   return (
     <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-3.5">
       <TaskToolbar
         viewMode={viewMode}
         onViewModeChange={setViewMode}
         onAddTask={() => openCreateTask()}
+        searchQuery={searchQuery}
+        isSearchOpen={isSearchOpen || hasSearchQuery}
+        onSearchOpenChange={handleSearchOpenChange}
+        onSearchQueryChange={handleSearchQueryChange}
+        onClearSearch={handleClearSearch}
       />
 
       {status === "loading" ? (
@@ -156,16 +219,23 @@ export function TasksView() {
         <TasksErrorState onRetry={() => void loadTasks()} />
       ) : tasks.length === 0 ? (
         <TasksEmptyState />
+      ) : hasSearchQuery && filteredTasks.length === 0 ? (
+        <TasksEmptyState
+          message="No tasks match your search."
+          actionLabel="Clear Search"
+          onAction={handleClearSearch}
+        />
       ) : viewMode === "list" ? (
         <TaskListView
-          tasks={tasks}
+          tasks={filteredTasks}
           onAddTask={openCreateTask}
           onEditTask={openEditTask}
           onDeleteTask={openDeleteTask}
+          hideEmptySections={hasSearchQuery}
         />
       ) : (
         <TaskBoardView
-          tasks={tasks}
+          tasks={filteredTasks}
           onAddTask={openCreateTask}
           onEditTask={openEditTask}
           onDeleteTask={openDeleteTask}

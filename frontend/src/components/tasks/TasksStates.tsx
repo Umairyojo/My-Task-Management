@@ -12,6 +12,12 @@ interface TasksErrorStateProps {
   onRetry: () => void;
 }
 
+interface TasksEmptyStateProps {
+  message?: string;
+  actionLabel?: string;
+  onAction?: () => void;
+}
+
 function ListSkeleton() {
   return (
     <div className="flex w-full min-w-[760px] flex-col gap-3">
@@ -111,11 +117,24 @@ export function TasksLoadingState({ viewMode }: TasksLoadingStateProps) {
   );
 }
 
-export function TasksEmptyState() {
+export function TasksEmptyState({
+  message = "No tasks yet.",
+  actionLabel,
+  onAction,
+}: TasksEmptyStateProps) {
   return (
     <div className="flex min-h-0 min-w-0 flex-1 items-start pt-6">
       <div className="rounded-lg border border-border bg-surface px-4 py-3 text-[13px] text-muted">
-        No tasks yet.
+        <p>{message}</p>
+        {actionLabel && onAction ? (
+          <button
+            type="button"
+            onClick={onAction}
+            className="mt-3 inline-flex h-8 items-center rounded-[4px] border border-border bg-background px-3 text-[12px] font-medium text-foreground transition-colors hover:bg-surface"
+          >
+            {actionLabel}
+          </button>
+        ) : null}
       </div>
     </div>
   );

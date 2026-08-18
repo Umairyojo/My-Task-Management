@@ -10,16 +10,8 @@ export interface TaskWriteInput {
   labels: string[];
 }
 
-function getApiBaseUrl(): string {
-  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
-
-  if (!baseUrl) {
-    throw new Error(
-      "NEXT_PUBLIC_API_BASE_URL is not configured. Add it to frontend/.env.local.",
-    );
-  }
-
-  return baseUrl;
+function getTasksApiUrl(path: string): string {
+  return `/api/tasks${path}`;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -97,7 +89,7 @@ function buildTaskRequestBody(input: TaskWriteInput): Record<string, unknown> {
 }
 
 export async function getTasks(): Promise<Task[]> {
-  const response = await fetch(new URL("/tasks", getApiBaseUrl()).toString(), {
+  const response = await fetch(getTasksApiUrl(""), {
     cache: "no-store",
   });
 
@@ -115,7 +107,7 @@ export async function getTasks(): Promise<Task[]> {
 }
 
 export async function createTask(input: TaskWriteInput): Promise<Task> {
-  const response = await fetch(new URL("/tasks", getApiBaseUrl()).toString(), {
+  const response = await fetch(getTasksApiUrl(""), {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -130,7 +122,7 @@ export async function updateTask(
   id: string,
   input: TaskWriteInput,
 ): Promise<Task> {
-  const response = await fetch(new URL(`/tasks/${id}`, getApiBaseUrl()).toString(), {
+  const response = await fetch(getTasksApiUrl(`/${id}`), {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
@@ -142,7 +134,7 @@ export async function updateTask(
 }
 
 export async function deleteTask(id: string): Promise<void> {
-  const response = await fetch(new URL(`/tasks/${id}`, getApiBaseUrl()).toString(), {
+  const response = await fetch(getTasksApiUrl(`/${id}`), {
     method: "DELETE",
   });
 
