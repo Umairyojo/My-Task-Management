@@ -9,6 +9,7 @@ interface TaskBoardViewProps {
   onAddTask: (status: TaskStatus) => void;
   onEditTask: (task: Task) => void;
   onDeleteTask: (task: Task) => void;
+  hideEmptySections?: boolean;
 }
 
 export function TaskBoardView({
@@ -16,12 +17,17 @@ export function TaskBoardView({
   onAddTask,
   onEditTask,
   onDeleteTask,
+  hideEmptySections = false,
 }: TaskBoardViewProps) {
   return (
     <div className="min-h-0 min-w-0 overflow-x-auto pb-1">
       <div className="flex w-max min-w-full gap-3">
         {taskBoardSections.map((section) => {
           const sectionTasks = tasks.filter((task) => task.status === section.key);
+
+          if (hideEmptySections && sectionTasks.length === 0) {
+            return null;
+          }
 
           return (
             <TaskBoardColumn

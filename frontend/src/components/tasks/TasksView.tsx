@@ -239,6 +239,7 @@ export function TasksView() {
           onAddTask={openCreateTask}
           onEditTask={openEditTask}
           onDeleteTask={openDeleteTask}
+          hideEmptySections={hasSearchQuery}
         />
       )}
 
