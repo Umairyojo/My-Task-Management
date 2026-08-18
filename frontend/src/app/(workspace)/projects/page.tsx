@@ -1,3 +1,5 @@
+import { ProjectsView } from "@/components/projects/ProjectsView";
+
 export default function ProjectsPage() {
-  return <h1 className="text-3xl font-semibold tracking-tight">Projects</h1>;
+  return <ProjectsView />;
 }

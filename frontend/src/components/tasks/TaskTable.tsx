@@ -13,6 +13,8 @@ interface TaskTableProps {
   onEditTask: (task: Task) => void;
   onDeleteTask: (task: Task) => void;
   fieldVisibility: TaskFieldVisibility;
+  showAddTask?: boolean;
+  showActions?: boolean;
 }
 
 export function TaskTable({
@@ -23,6 +25,8 @@ export function TaskTable({
   onEditTask,
   onDeleteTask,
   fieldVisibility,
+  showAddTask = true,
+  showActions = true,
 }: TaskTableProps) {
   const visibleColumnCount =
     1 +
@@ -31,7 +35,7 @@ export function TaskTable({
     (fieldVisibility.dueDate ? 1 : 0) +
     (fieldVisibility.labels ? 1 : 0) +
     (fieldVisibility.status ? 1 : 0) +
-    1;
+    (showActions ? 1 : 0);
 
   return (
     <div className="overflow-hidden rounded-[10px] border border-border bg-background">
@@ -54,7 +58,9 @@ export function TaskTable({
             {fieldVisibility.status ? (
               <th className="w-[10%] px-4 py-2 font-medium">Status</th>
             ) : null}
-            <th className="w-[6%] px-4 py-2 font-medium text-right">Actions</th>
+            {showActions ? (
+              <th className="w-[6%] px-4 py-2 font-medium text-right">Actions</th>
+            ) : null}
           </tr>
         </thead>
         <tbody>
@@ -66,23 +72,26 @@ export function TaskTable({
               onEditTask={onEditTask}
               onDeleteTask={onDeleteTask}
               fieldVisibility={fieldVisibility}
+              showActions={showActions}
             />
           ))}
         </tbody>
-        <tfoot>
-          <tr className="border-t border-border">
-            <td colSpan={visibleColumnCount} className="px-4 py-2.5">
-              <button
-                type="button"
-                onClick={() => onAddTask(status)}
-                className="inline-flex items-center gap-1.5 text-[12px] font-medium text-muted transition-colors hover:text-foreground"
-              >
-                <Plus className="h-4 w-4" aria-hidden="true" />
-                Add Task
-              </button>
-            </td>
-          </tr>
-        </tfoot>
+        {showAddTask ? (
+          <tfoot>
+            <tr className="border-t border-border">
+              <td colSpan={visibleColumnCount} className="px-4 py-2.5">
+                <button
+                  type="button"
+                  onClick={() => onAddTask(status)}
+                  className="inline-flex items-center gap-1.5 text-[12px] font-medium text-muted transition-colors hover:text-foreground"
+                >
+                  <Plus className="h-4 w-4" aria-hidden="true" />
+                  Add Task
+                </button>
+              </td>
+            </tr>
+          </tfoot>
+        ) : null}
       </table>
     </div>
   );

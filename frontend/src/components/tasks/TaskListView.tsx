@@ -12,6 +12,8 @@ interface TaskListViewProps {
   onDeleteTask: (task: Task) => void;
   hideEmptySections?: boolean;
   fieldVisibility: TaskFieldVisibility;
+  showAddTask?: boolean;
+  showActions?: boolean;
 }
 
 export function TaskListView({
@@ -21,6 +23,8 @@ export function TaskListView({
   onDeleteTask,
   hideEmptySections = false,
   fieldVisibility,
+  showAddTask = true,
+  showActions = true,
 }: TaskListViewProps) {
   return (
     <div className="flex min-h-0 min-w-0 flex-1 flex-col">
@@ -43,6 +47,8 @@ export function TaskListView({
               onEditTask={onEditTask}
               onDeleteTask={onDeleteTask}
               fieldVisibility={fieldVisibility}
+              showAddTask={showAddTask}
+              showActions={showActions}
             />
           );
         })}

@@ -146,7 +146,75 @@ const seedTasks = [
   },
 ] as const;
 
+const seedProjects = [
+  {
+    id: '22222222-2222-4222-8222-222222222221',
+    name: 'Web App Redesign',
+    priority: TaskPriority.HIGH,
+    leadName: 'Dexter',
+    dueDate: new Date('2026-10-10T00:00:00.000Z'),
+  },
+  {
+    id: '22222222-2222-4222-8222-222222222222',
+    name: 'Mobile Companion',
+    priority: TaskPriority.MEDIUM,
+    leadName: 'CN',
+    dueDate: new Date('2026-10-18T00:00:00.000Z'),
+  },
+  {
+    id: '22222222-2222-4222-8222-222222222223',
+    name: 'Internal Operations',
+    priority: TaskPriority.LOW,
+    leadName: null,
+    dueDate: null,
+  },
+] as const;
+
+function getSeedProjectId(taskId: string): string {
+  if (
+    taskId === '11111111-1111-4111-8111-111111111111' ||
+    taskId === '11111111-1111-4111-8111-111111111112' ||
+    taskId === '11111111-1111-4111-8111-111111111113'
+  ) {
+    return '22222222-2222-4222-8222-222222222221';
+  }
+
+  if (
+    taskId === '11111111-1111-4111-8111-111111111114' ||
+    taskId === '11111111-1111-4111-8111-111111111115' ||
+    taskId === '11111111-1111-4111-8111-111111111116' ||
+    taskId === '11111111-1111-4111-8111-111111111117'
+  ) {
+    return '22222222-2222-4222-8222-222222222222';
+  }
+
+  return '22222222-2222-4222-8222-222222222223';
+}
+
 async function main(): Promise<void> {
+  await prisma.$transaction(
+    seedProjects.map((project) =>
+      prisma.project.upsert({
+        where: {
+          id: project.id,
+        },
+        update: {
+          name: project.name,
+          priority: project.priority,
+          leadName: project.leadName,
+          dueDate: project.dueDate,
+        },
+        create: {
+          id: project.id,
+          name: project.name,
+          priority: project.priority,
+          leadName: project.leadName,
+          dueDate: project.dueDate,
+        },
+      }),
+    ),
+  );
+
   await prisma.$transaction(
     seedTasks.map((task) =>
       prisma.task.upsert({
@@ -161,6 +229,7 @@ async function main(): Promise<void> {
           assigneeInitials: task.assigneeInitials,
           dueDate: task.dueDate,
           labels: [...task.labels],
+          projectId: getSeedProjectId(task.id),
         },
         create: {
           id: task.id,
@@ -171,6 +240,7 @@ async function main(): Promise<void> {
           assigneeInitials: task.assigneeInitials,
           dueDate: task.dueDate,
           labels: [...task.labels],
+          projectId: getSeedProjectId(task.id),
         },
       }),
     ),

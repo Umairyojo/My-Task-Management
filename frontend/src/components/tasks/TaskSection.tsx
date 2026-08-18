@@ -13,6 +13,8 @@ interface TaskSectionProps {
   onEditTask: (task: Task) => void;
   onDeleteTask: (task: Task) => void;
   fieldVisibility: TaskFieldVisibility;
+  showAddTask?: boolean;
+  showActions?: boolean;
 }
 
 export function TaskSection({
@@ -23,6 +25,8 @@ export function TaskSection({
   onEditTask,
   onDeleteTask,
   fieldVisibility,
+  showAddTask = true,
+  showActions = true,
 }: TaskSectionProps) {
   return (
     <section className="space-y-1.5">
@@ -38,6 +42,8 @@ export function TaskSection({
         onEditTask={onEditTask}
         onDeleteTask={onDeleteTask}
         fieldVisibility={fieldVisibility}
+        showAddTask={showAddTask}
+        showActions={showActions}
       />
     </section>
   );

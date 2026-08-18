@@ -14,6 +14,7 @@ interface TaskRowProps {
   onEditTask: (task: Task) => void;
   onDeleteTask: (task: Task) => void;
   fieldVisibility: TaskFieldVisibility;
+  showActions?: boolean;
 }
 
 export function TaskRow({
@@ -22,6 +23,7 @@ export function TaskRow({
   onEditTask,
   onDeleteTask,
   fieldVisibility,
+  showActions = true,
 }: TaskRowProps) {
   const dueDate = formatTaskDate(task.dueDate);
 
@@ -80,15 +82,17 @@ export function TaskRow({
           </span>
         </td>
       ) : null}
-      <td className="px-4 py-2.5 align-middle text-right">
-        <div className="flex justify-end">
-          <TaskActionsMenu
-            taskTitle={task.title}
-            onEdit={() => onEditTask(task)}
-            onDelete={() => onDeleteTask(task)}
-          />
-        </div>
-      </td>
+      {showActions ? (
+        <td className="px-4 py-2.5 align-middle text-right">
+          <div className="flex justify-end">
+            <TaskActionsMenu
+              taskTitle={task.title}
+              onEdit={() => onEditTask(task)}
+              onDelete={() => onDeleteTask(task)}
+            />
+          </div>
+        </td>
+      ) : null}
     </tr>
   );
 }
