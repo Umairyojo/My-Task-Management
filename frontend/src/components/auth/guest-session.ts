@@ -1,32 +1,80 @@
 export interface GuestSession {
+  id: string;
+  email: string;
   name: string;
   initials: string;
 }
 
-export const GUEST_SESSION_STORAGE_KEY = "task-management-guest-session";
-export const GUEST_SESSION_CHANGE_EVENT = "task-management-guest-session-change";
+export interface GuestIdentity {
+  name: string;
+  initials: string;
+}
 
-const defaultGuestSession: GuestSession = {
+export const DEFAULT_GUEST_IDENTITY: GuestIdentity = {
   name: "Dexter",
   initials: "D",
 };
+
+export const GUEST_SESSION_STORAGE_KEY = "task-management-guest-session";
+export const GUEST_SESSION_CHANGE_EVENT = "task-management-guest-session-change";
+
+let cachedGuestSessionRaw: string | null | undefined = undefined;
+let cachedGuestSessionSnapshot: GuestSession | null = null;
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
 }
 
-export function getDefaultGuestSession(): GuestSession {
-  return defaultGuestSession;
+function getGuestId(): string {
+  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+    return crypto.randomUUID();
+  }
+
+  return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+}
+
+function getGuestEmail(id: string): string {
+  return `guest-${id.slice(0, 8)}@ablespace.local`;
+}
+
+function normalizeGuestIdentity(identity: Partial<GuestIdentity>): GuestIdentity {
+  const name = identity.name?.trim() || DEFAULT_GUEST_IDENTITY.name;
+  const initials = identity.initials?.trim() || DEFAULT_GUEST_IDENTITY.initials;
+
+  return {
+    name,
+    initials: initials.toUpperCase().slice(0, 2),
+  };
+}
+
+export function createGuestSession(
+  identity: Partial<GuestIdentity> = {},
+): GuestSession {
+  const normalizedIdentity = normalizeGuestIdentity(identity);
+  const id = getGuestId();
+
+  return {
+    id,
+    email: getGuestEmail(id),
+    name: normalizedIdentity.name,
+    initials: normalizedIdentity.initials,
+  };
 }
 
 export function getStoredGuestSession(): GuestSession | null {
   if (typeof window === "undefined") {
-    return null;
+    return cachedGuestSessionSnapshot;
   }
 
-  const rawValue = window.localStorage.getItem(GUEST_SESSION_STORAGE_KEY);
+  const rawValue = window.sessionStorage.getItem(GUEST_SESSION_STORAGE_KEY);
+
+  if (rawValue === cachedGuestSessionRaw) {
+    return cachedGuestSessionSnapshot;
+  }
 
   if (!rawValue) {
+    cachedGuestSessionRaw = null;
+    cachedGuestSessionSnapshot = null;
     return null;
   }
 
@@ -35,42 +83,60 @@ export function getStoredGuestSession(): GuestSession | null {
 
     if (
       isRecord(parsed) &&
+      typeof parsed.id === "string" &&
+      typeof parsed.email === "string" &&
       typeof parsed.name === "string" &&
       typeof parsed.initials === "string" &&
+      parsed.id.trim().length > 0 &&
+      parsed.email.trim().length > 0 &&
       parsed.name.trim().length > 0 &&
       parsed.initials.trim().length > 0
     ) {
-      const name = parsed.name.trim();
-      const initials = parsed.initials.trim();
-
-      if (name === "Guest" && initials === "G") {
-        return defaultGuestSession;
-      }
-
-      return {
-        name,
-        initials,
+      const nextSession: GuestSession = {
+        id: parsed.id.trim(),
+        email: parsed.email.trim(),
+        name: parsed.name.trim(),
+        initials: parsed.initials.trim().toUpperCase().slice(0, 2),
       };
+
+      cachedGuestSessionRaw = rawValue;
+      cachedGuestSessionSnapshot = nextSession;
+
+      return nextSession;
     }
   } catch {
+    cachedGuestSessionRaw = null;
+    cachedGuestSessionSnapshot = null;
     return null;
   }
 
+  cachedGuestSessionRaw = null;
+  cachedGuestSessionSnapshot = null;
   return null;
 }
 
 export function setStoredGuestSession(session: GuestSession): void {
-  window.localStorage.setItem(
-    GUEST_SESSION_STORAGE_KEY,
-    JSON.stringify({
-      name: session.name.trim() || defaultGuestSession.name,
-      initials: session.initials.trim() || defaultGuestSession.initials,
-    }),
-  );
+  const nextId = session.id.trim() || getGuestId();
+  const nextSession: GuestSession = {
+    id: nextId,
+    email: session.email.trim() || getGuestEmail(nextId),
+    name: session.name.trim() || DEFAULT_GUEST_IDENTITY.name,
+    initials:
+      session.initials.trim().toUpperCase().slice(0, 2) ||
+      DEFAULT_GUEST_IDENTITY.initials,
+  };
+
+  const rawValue = JSON.stringify(nextSession);
+
+  window.sessionStorage.setItem(GUEST_SESSION_STORAGE_KEY, rawValue);
+  cachedGuestSessionRaw = rawValue;
+  cachedGuestSessionSnapshot = nextSession;
   window.dispatchEvent(new Event(GUEST_SESSION_CHANGE_EVENT));
 }
 
 export function clearStoredGuestSession(): void {
-  window.localStorage.removeItem(GUEST_SESSION_STORAGE_KEY);
+  window.sessionStorage.removeItem(GUEST_SESSION_STORAGE_KEY);
+  cachedGuestSessionRaw = null;
+  cachedGuestSessionSnapshot = null;
   window.dispatchEvent(new Event(GUEST_SESSION_CHANGE_EVENT));
 }

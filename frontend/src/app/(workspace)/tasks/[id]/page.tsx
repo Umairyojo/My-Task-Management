@@ -1,11 +1,13 @@
 import { TaskDetailView } from "@/components/tasks/TaskDetailView";
 
 interface TaskDetailPageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
-export default function TaskDetailPage({ params }: TaskDetailPageProps) {
-  return <TaskDetailView taskId={params.id} />;
+export default async function TaskDetailPage({ params }: TaskDetailPageProps) {
+  const { id } = await params;
+
+  return <TaskDetailView taskId={id} />;
 }

@@ -2,12 +2,13 @@
 
 import {
   type Dispatch,
-  type KeyboardEvent,
+  type KeyboardEvent as ReactKeyboardEvent,
   type SetStateAction,
   useEffect,
   useRef,
   useState,
 } from "react";
+import { createPortal } from "react-dom";
 import {
   Check,
   ChevronDown,
@@ -69,6 +70,13 @@ export function TaskToolbar({
   const [isFieldsOpen, setIsFieldsOpen] = useState(false);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const fieldsPanelRef = useRef<HTMLDivElement>(null);
+  const fieldsPopoverRef = useRef<HTMLDivElement>(null);
+  const [fieldsPopoverPosition, setFieldsPopoverPosition] = useState<{
+    top: number;
+    left: number;
+    right?: number;
+    width?: number;
+  } | null>(null);
   const filterButtonRef = useRef<HTMLButtonElement>(null);
   const searchPanelRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -82,22 +90,68 @@ export function TaskToolbar({
       return;
     }
 
+    const updateFieldsPopoverPosition = () => {
+      const trigger = fieldsPanelRef.current;
+
+      if (!trigger) {
+        return;
+      }
+
+      const rect = trigger.getBoundingClientRect();
+      const isCompactViewport = window.innerWidth < 640;
+      const availableWidth = Math.max(0, window.innerWidth - 16);
+
+      if (isCompactViewport) {
+        setFieldsPopoverPosition({
+          top: rect.bottom + 8,
+          left: 8,
+          right: 8,
+        });
+        return;
+      }
+
+      const width = Math.min(264, availableWidth);
+      const left = Math.max(8, Math.min(rect.right - width, window.innerWidth - width - 8));
+
+      setFieldsPopoverPosition({
+        top: rect.bottom + 8,
+        left,
+        width,
+      });
+    };
+
+    updateFieldsPopoverPosition();
+
     const handlePointerDown = (event: PointerEvent) => {
       const target = event.target;
 
       if (
         target instanceof Node &&
         fieldsPanelRef.current &&
-        !fieldsPanelRef.current.contains(target)
+        fieldsPopoverRef.current &&
+        !fieldsPanelRef.current.contains(target) &&
+        !fieldsPopoverRef.current.contains(target)
       ) {
         setIsFieldsOpen(false);
       }
     };
 
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsFieldsOpen(false);
+      }
+    };
+
     document.addEventListener("pointerdown", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("resize", updateFieldsPopoverPosition);
+    window.addEventListener("scroll", updateFieldsPopoverPosition, true);
 
     return () => {
       document.removeEventListener("pointerdown", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("resize", updateFieldsPopoverPosition);
+      window.removeEventListener("scroll", updateFieldsPopoverPosition, true);
     };
   }, [isFieldsOpen]);
 
@@ -135,7 +189,7 @@ export function TaskToolbar({
     };
   }, [hasSearchQuery, isSearchOpen, onSearchOpenChange]);
 
-  const handleSearchInputKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
+  const handleSearchInputKeyDown = (event: ReactKeyboardEvent<HTMLInputElement>) => {
     if (event.key !== "Escape") {
       return;
     }
@@ -154,15 +208,15 @@ export function TaskToolbar({
   };
 
   return (
-    <div className="flex items-center justify-between gap-4">
-      <h1 className="text-[20px] font-semibold leading-none tracking-[-0.02em] text-foreground">
+    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+      <h1 className="text-[18px] font-semibold leading-none tracking-[-0.02em] text-foreground sm:text-[20px]">
         Tasks
       </h1>
 
-      <div className="flex shrink-0 items-center gap-2">
+      <div className="flex flex-wrap items-center gap-2 sm:justify-end">
         <div ref={searchPanelRef}>
           {isSearchOpen ? (
-            <div className="flex h-8 w-[373px] max-w-full items-center gap-2 rounded-[4px] border border-border bg-background px-2.5">
+            <div className="flex h-9 w-full max-w-[373px] items-center gap-2 rounded-[4px] border border-border bg-background px-2.5 sm:h-8">
               <Search className="h-4 w-4 shrink-0 text-muted" aria-hidden="true" />
               <input
                 ref={searchInputRef}
@@ -201,7 +255,7 @@ export function TaskToolbar({
               type="button"
               onClick={() => onSearchOpenChange(true)}
               aria-label="Search tasks"
-              className="inline-flex h-8 w-8 items-center justify-center rounded-[4px] border border-border bg-background text-muted transition-colors hover:bg-surface hover:text-foreground"
+              className="inline-flex h-9 w-9 items-center justify-center rounded-[4px] border border-border bg-background text-muted transition-colors hover:bg-surface hover:text-foreground sm:h-8 sm:w-8"
             >
               <Search className="h-4 w-4" aria-hidden="true" />
             </button>
@@ -217,81 +271,102 @@ export function TaskToolbar({
               setIsFilterOpen(false);
               setIsFieldsOpen((current) => !current);
             }}
-            className="inline-flex h-8 items-center gap-1.5 rounded-[4px] border border-border bg-background px-3 text-[13px] font-medium text-foreground transition-colors hover:bg-surface"
+            className="inline-flex h-9 items-center gap-1.5 rounded-[4px] border border-border bg-background px-3 text-[13px] font-medium text-foreground transition-colors hover:bg-surface sm:h-8"
           >
             <span>Fields</span>
             <ChevronDown className="h-3.5 w-3.5 text-muted" aria-hidden="true" />
           </button>
 
-          {isFieldsOpen ? (
-            <div className="absolute right-0 top-full z-20 mt-2 w-[264px] rounded-lg border border-border bg-background p-3 shadow-sm">
-              <div className="flex rounded-md border border-border bg-surface p-0.5 text-[12px] font-medium text-muted">
-                <button
-                  type="button"
-                  aria-pressed={viewMode === "list"}
-                  onClick={() => {
-                    onViewModeChange("list");
-                    setIsFieldsOpen(false);
+          {isFieldsOpen && fieldsPopoverPosition && typeof document !== "undefined"
+            ? createPortal(
+                <div
+                  ref={fieldsPopoverRef}
+                  role="dialog"
+                  aria-label="Task fields"
+                  className="fixed z-50 flex max-h-[calc(100dvh-1rem)] flex-col overflow-hidden rounded-lg border border-border bg-background p-3 shadow-sm"
+                  style={{
+                    top: fieldsPopoverPosition.top,
+                    left: fieldsPopoverPosition.left,
+                    right: fieldsPopoverPosition.right,
+                    width:
+                      fieldsPopoverPosition.width !== undefined
+                        ? `${fieldsPopoverPosition.width}px`
+                        : "auto",
+                    maxWidth:
+                      fieldsPopoverPosition.width !== undefined
+                        ? `${fieldsPopoverPosition.width}px`
+                        : undefined,
                   }}
-                  className={[
-                    "flex h-7 flex-1 items-center justify-center rounded-[4px] transition-colors",
-                    viewMode === "list" ? "bg-background text-foreground" : "",
-                  ].join(" ")}
                 >
-                  <List className="mr-1.5 h-3.5 w-3.5" aria-hidden="true" />
-                  List
-                </button>
-                <button
-                  type="button"
-                  aria-pressed={viewMode === "board"}
-                  onClick={() => {
-                    onViewModeChange("board");
-                    setIsFieldsOpen(false);
-                  }}
-                  className={[
-                    "flex h-7 flex-1 items-center justify-center rounded-[4px] transition-colors",
-                    viewMode === "board" ? "bg-background text-foreground" : "",
-                  ].join(" ")}
-                >
-                  <LayoutGrid className="mr-1.5 h-3.5 w-3.5" aria-hidden="true" />
-                  Board
-                </button>
-              </div>
-
-              <div className="mt-3 space-y-1">
-                {taskFieldOptions.map((option) => {
-                  const checked = fieldVisibility[option.key];
-
-                  return (
+                  <div className="flex rounded-md border border-border bg-surface p-0.5 text-[12px] font-medium text-muted">
                     <button
-                      key={option.key}
                       type="button"
-                      aria-pressed={checked}
-                      onClick={() =>
-                        onFieldVisibilityChange((current) => ({
-                          ...current,
-                          [option.key]: !current[option.key],
-                        }))
-                      }
-                      className="flex h-8 w-full items-center justify-between rounded-md px-2 text-[12px] text-foreground transition-colors hover:bg-surface"
+                      aria-pressed={viewMode === "list"}
+                      onClick={() => {
+                        onViewModeChange("list");
+                        setIsFieldsOpen(false);
+                      }}
+                      className={[
+                        "flex h-7 min-w-0 flex-1 items-center justify-center rounded-[4px] transition-colors",
+                        viewMode === "list" ? "bg-background text-foreground" : "",
+                      ].join(" ")}
                     >
-                      <span>{option.label}</span>
-                      <span
-                        className={[
-                          "inline-flex h-4 w-4 items-center justify-center rounded-[3px] border",
-                          checked
-                            ? "border-foreground bg-foreground text-background"
-                            : "border-border bg-background text-transparent",
-                        ].join(" ")}
-                      >
-                        <Check className="h-3 w-3" aria-hidden="true" />
-                      </span>
+                      <List className="mr-1.5 h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+                      <span className="truncate">List</span>
                     </button>
-                  );
-                })}
-              </div>
-            </div>
-          ) : null}
+                    <button
+                      type="button"
+                      aria-pressed={viewMode === "board"}
+                      onClick={() => {
+                        onViewModeChange("board");
+                        setIsFieldsOpen(false);
+                      }}
+                      className={[
+                        "flex h-7 min-w-0 flex-1 items-center justify-center rounded-[4px] transition-colors",
+                        viewMode === "board" ? "bg-background text-foreground" : "",
+                      ].join(" ")}
+                    >
+                      <LayoutGrid className="mr-1.5 h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+                      <span className="truncate">Board</span>
+                    </button>
+                  </div>
+
+                  <div className="mt-3 min-h-0 space-y-1 overflow-y-auto">
+                    {taskFieldOptions.map((option) => {
+                      const checked = fieldVisibility[option.key];
+
+                      return (
+                        <button
+                          key={option.key}
+                          type="button"
+                          aria-pressed={checked}
+                          onClick={() =>
+                            onFieldVisibilityChange((current) => ({
+                              ...current,
+                              [option.key]: !current[option.key],
+                            }))
+                          }
+                          className="flex h-8 w-full items-center justify-between rounded-md px-2 text-[12px] text-foreground transition-colors hover:bg-surface"
+                        >
+                          <span className="truncate">{option.label}</span>
+                          <span
+                            className={[
+                              "inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-[3px] border",
+                              checked
+                                ? "border-foreground bg-foreground text-background"
+                                : "border-border bg-background text-transparent",
+                            ].join(" ")}
+                          >
+                            <Check className="h-3 w-3" aria-hidden="true" />
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>,
+                document.body,
+              )
+            : null}
         </div>
 
         <div className="relative">
@@ -303,7 +378,7 @@ export function TaskToolbar({
             aria-haspopup="dialog"
             aria-expanded={isFilterOpen}
             className={[
-              "relative inline-flex h-8 w-8 items-center justify-center rounded-[4px] border transition-colors",
+              "relative inline-flex h-9 w-9 items-center justify-center rounded-[4px] border transition-colors sm:h-8 sm:w-8",
               hasActiveFilters
                 ? "border-border bg-surface text-foreground"
                 : "border-border bg-background text-muted hover:bg-surface hover:text-foreground",
@@ -331,7 +406,7 @@ export function TaskToolbar({
         <button
           type="button"
           onClick={onAddTask}
-          className="inline-flex h-8 items-center gap-1.5 rounded-[4px] border border-border bg-foreground px-3 text-[13px] font-medium text-background transition-colors hover:opacity-90"
+          className="inline-flex h-9 items-center gap-1.5 rounded-[4px] border border-border bg-foreground px-3 text-[13px] font-medium text-background transition-colors hover:opacity-90 sm:h-8"
         >
           <Plus className="h-4 w-4" aria-hidden="true" />
           <span>Add Task</span>

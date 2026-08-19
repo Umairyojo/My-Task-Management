@@ -148,7 +148,13 @@ export function TaskFiltersPopover({
       }
 
       const rect = trigger.getBoundingClientRect();
-      const left = Math.max(8, Math.min(rect.right - popoverWidth, window.innerWidth - popoverWidth - 8));
+      const isCompactViewport = window.innerWidth < 640;
+      const width = isCompactViewport
+        ? window.innerWidth - 16
+        : Math.min(popoverWidth, window.innerWidth - 16);
+      const left = isCompactViewport
+        ? 8
+        : Math.max(8, Math.min(rect.right - width, window.innerWidth - width - 8));
 
       setPosition({
         top: rect.bottom + 8,
@@ -235,7 +241,7 @@ export function TaskFiltersPopover({
       ref={popoverRef}
       role="dialog"
       aria-label="Task filters"
-      className="fixed z-50 flex max-h-[calc(100vh-120px)] w-[332px] flex-col overflow-hidden rounded-[8px] border border-border bg-background shadow-[0_18px_40px_rgba(0,0,0,0.12)]"
+      className="fixed z-50 flex max-h-[calc(100dvh-1rem)] w-[calc(100vw-1rem)] max-w-none flex-col overflow-hidden rounded-[8px] border border-border bg-background shadow-[0_18px_40px_rgba(0,0,0,0.12)] sm:w-[332px] sm:max-w-[332px]"
       style={{
         top: position.top,
         left: position.left,

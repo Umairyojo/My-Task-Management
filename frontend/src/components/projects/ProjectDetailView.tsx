@@ -255,7 +255,7 @@ export function ProjectDetailView({ projectId }: { projectId: string }) {
 
   return (
     <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-4">
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
         <Link
           href="/projects"
           className="inline-flex items-center gap-2 text-[12px] font-medium text-muted transition-colors hover:text-foreground"
@@ -264,11 +264,11 @@ export function ProjectDetailView({ projectId }: { projectId: string }) {
           Back to Projects
         </Link>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <button
             type="button"
             onClick={() => setIsEditOpen(true)}
-            className="inline-flex h-8 items-center gap-1.5 rounded-[4px] border border-border bg-background px-3 text-[12px] font-medium text-foreground transition-colors hover:bg-surface"
+            className="inline-flex h-9 items-center gap-1.5 rounded-[4px] border border-border bg-background px-3 text-[12px] font-medium text-foreground transition-colors hover:bg-surface sm:h-8"
           >
             <Edit3 className="h-3.5 w-3.5" aria-hidden="true" />
             Edit Project
@@ -276,7 +276,7 @@ export function ProjectDetailView({ projectId }: { projectId: string }) {
           <button
             type="button"
             onClick={() => setIsDeleteOpen(true)}
-            className="inline-flex h-8 items-center rounded-[4px] border border-border bg-background px-3 text-[12px] font-medium text-red-600 transition-colors hover:bg-red-50"
+            className="inline-flex h-9 items-center rounded-[4px] border border-border bg-background px-3 text-[12px] font-medium text-red-600 transition-colors hover:bg-red-50 sm:h-8"
           >
             Delete
           </button>

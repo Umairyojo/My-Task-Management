@@ -126,15 +126,15 @@ export function ProjectsView() {
 
   return (
     <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-3.5">
-      <div className="flex items-center justify-between gap-4">
-        <h1 className="text-[20px] font-semibold leading-none tracking-[-0.02em] text-foreground">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+        <h1 className="text-[18px] font-semibold leading-none tracking-[-0.02em] text-foreground sm:text-[20px]">
           Projects
         </h1>
 
         <button
           type="button"
           onClick={handleCreateProject}
-          className="inline-flex h-8 items-center gap-1.5 rounded-[4px] border border-border bg-foreground px-3 text-[13px] font-medium text-background transition-colors hover:opacity-90"
+          className="inline-flex h-9 items-center gap-1.5 rounded-[4px] border border-border bg-foreground px-3 text-[13px] font-medium text-background transition-colors hover:opacity-90 sm:h-8"
         >
           <Plus className="h-4 w-4" aria-hidden="true" />
           Add Project
@@ -151,8 +151,8 @@ export function ProjectsView() {
       ) : projects.length === 0 ? (
         <ProjectsEmptyState onAction={handleCreateProject} />
       ) : (
-        <div className="overflow-hidden rounded-[10px] border border-border bg-background">
-          <table className="min-w-full border-collapse">
+        <div className="overflow-x-auto pb-1">
+          <table className="min-w-[720px] overflow-hidden rounded-[10px] border border-border bg-background border-collapse">
             <thead className="bg-surface">
               <tr className="text-left text-[11px] font-medium text-muted">
                 <th className="w-[36%] px-4 py-2 font-medium">Project</th>

@@ -21,6 +21,13 @@ async function proxyToBackend(request: NextRequest, id: string): Promise<Respons
     responseHeaders.set("content-type", contentType);
   }
 
+  if (backendResponse.status === 204 || backendResponse.status === 304) {
+    return new Response(null, {
+      status: backendResponse.status,
+      headers: responseHeaders,
+    });
+  }
+
   return new Response(await backendResponse.text(), {
     status: backendResponse.status,
     headers: responseHeaders,

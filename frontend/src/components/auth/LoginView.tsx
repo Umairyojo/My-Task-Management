@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { CheckCircle2, Sparkles } from "lucide-react";
 import {
-  getDefaultGuestSession,
+  createGuestSession,
   getStoredGuestSession,
   setStoredGuestSession,
 } from "./guest-session";
@@ -39,7 +39,7 @@ export function LoginView() {
   }, [guestSession, router]);
 
   const handleGuestLogin = () => {
-    setStoredGuestSession(getDefaultGuestSession());
+    setStoredGuestSession(createGuestSession());
     router.replace("/tasks");
   };
 

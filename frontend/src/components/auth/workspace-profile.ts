@@ -1,10 +1,9 @@
 import { useSyncExternalStore } from "react";
 import {
-  getDefaultGuestSession,
-  getStoredGuestSession,
-  GUEST_SESSION_STORAGE_KEY,
-  setStoredGuestSession,
+  DEFAULT_GUEST_IDENTITY,
   GUEST_SESSION_CHANGE_EVENT,
+  getStoredGuestSession,
+  setStoredGuestSession,
 } from "./guest-session";
 
 export interface WorkspaceProfile {
@@ -21,24 +20,24 @@ export interface WorkspaceProfileFormValues {
   username: string;
 }
 
-export const WORKSPACE_PROFILE_STORAGE_KEY =
+const DEFAULT_WORKSPACE_EMAIL = "guest@ablespace.local";
+const DEFAULT_WORKSPACE_PROFILE: WorkspaceProfile = {
+  fullName: DEFAULT_GUEST_IDENTITY.name,
+  title: "Designer",
+  username: "Dexuser",
+  email: DEFAULT_WORKSPACE_EMAIL,
+  initials: DEFAULT_GUEST_IDENTITY.initials,
+};
+
+const WORKSPACE_PROFILE_STORAGE_KEY_PREFIX = "task-management-workspace-profile";
+const LEGACY_WORKSPACE_PROFILE_STORAGE_KEY =
   "task-management-workspace-profile";
 export const WORKSPACE_PROFILE_CHANGE_EVENT =
   "task-management-workspace-profile-change";
 
-const DEFAULT_WORKSPACE_EMAIL = "dexter@gmail.com";
-
-const DEFAULT_WORKSPACE_PROFILE: WorkspaceProfile = {
-  fullName: "Dexter",
-  title: "Designer",
-  username: "Dexuser",
-  email: DEFAULT_WORKSPACE_EMAIL,
-  initials: "D",
-};
-
+let cachedWorkspaceProfileKey: string | null | undefined = undefined;
 let cachedWorkspaceProfileRaw: string | null | undefined = undefined;
-let cachedWorkspaceProfileSnapshot: WorkspaceProfile =
-  DEFAULT_WORKSPACE_PROFILE;
+let cachedWorkspaceProfileSnapshot: WorkspaceProfile = DEFAULT_WORKSPACE_PROFILE;
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
@@ -51,7 +50,7 @@ function getInitials(value: string): string {
     .filter(Boolean);
 
   if (parts.length === 0) {
-    return "G";
+    return DEFAULT_GUEST_IDENTITY.initials;
   }
 
   return parts
@@ -61,48 +60,81 @@ function getInitials(value: string): string {
     .toUpperCase();
 }
 
-function isLegacyWorkspaceProfile(profile: WorkspaceProfile): boolean {
-  return (
-    profile.fullName === "Guest" &&
-    profile.title === "Guest" &&
-    profile.username === "guest" &&
-    profile.email === "guest@ablespace.local" &&
-    profile.initials === "G"
-  );
+function getWorkspaceProfileStorageKey(sessionId: string): string {
+  return `${WORKSPACE_PROFILE_STORAGE_KEY_PREFIX}:${sessionId}`;
 }
 
 function normalizeStoredEmail(email: string): string {
   const trimmedEmail = email.trim();
 
-  if (
-    trimmedEmail.length === 0 ||
-    trimmedEmail === "guest@ablespace.local"
-  ) {
+  if (trimmedEmail.length === 0) {
     return DEFAULT_WORKSPACE_EMAIL;
   }
 
   return trimmedEmail;
 }
 
-export function createDefaultWorkspaceProfile(): WorkspaceProfile {
-  const guestSession =
-    typeof window === "undefined" ? null : getStoredGuestSession();
-  const fallbackGuest = guestSession ?? getDefaultGuestSession();
+function createProfileFromSession(): WorkspaceProfile {
+  const guestSession = getStoredGuestSession();
+
+  if (!guestSession) {
+    return DEFAULT_WORKSPACE_PROFILE;
+  }
 
   return {
-    fullName: fallbackGuest.name,
+    fullName: guestSession.name,
     title: DEFAULT_WORKSPACE_PROFILE.title,
     username: DEFAULT_WORKSPACE_PROFILE.username,
-    email: DEFAULT_WORKSPACE_EMAIL,
-    initials: fallbackGuest.initials,
+    email: guestSession.email,
+    initials: guestSession.initials,
   };
+}
+
+function parseWorkspaceProfile(rawValue: string): WorkspaceProfile | null {
+  try {
+    const parsed: unknown = JSON.parse(rawValue);
+
+    if (
+      isRecord(parsed) &&
+      typeof parsed.fullName === "string" &&
+      typeof parsed.title === "string" &&
+      typeof parsed.username === "string" &&
+      typeof parsed.email === "string" &&
+      typeof parsed.initials === "string" &&
+      parsed.fullName.trim().length > 0 &&
+      parsed.username.trim().length > 0 &&
+      parsed.email.trim().length > 0 &&
+      parsed.initials.trim().length > 0
+    ) {
+      return {
+        fullName: parsed.fullName.trim(),
+        title: parsed.title.trim() || DEFAULT_WORKSPACE_PROFILE.title,
+        username: parsed.username.trim(),
+        email: normalizeStoredEmail(parsed.email),
+        initials: parsed.initials.trim().toUpperCase().slice(0, 2),
+      };
+    }
+  } catch {
+    return null;
+  }
+
+  return null;
+}
+
+function invalidateWorkspaceProfileCache(): void {
+  cachedWorkspaceProfileKey = undefined;
+  cachedWorkspaceProfileRaw = undefined;
+}
+
+export function createDefaultWorkspaceProfile(): WorkspaceProfile {
+  return DEFAULT_WORKSPACE_PROFILE;
 }
 
 export function toWorkspaceProfile(
   values: WorkspaceProfileFormValues,
   currentEmail: string = DEFAULT_WORKSPACE_EMAIL,
 ): WorkspaceProfile {
-  const fullName = values.fullName.trim() || getDefaultGuestSession().name;
+  const fullName = values.fullName.trim() || DEFAULT_GUEST_IDENTITY.name;
   const title = values.title.trim() || DEFAULT_WORKSPACE_PROFILE.title;
   const username = values.username.trim() || DEFAULT_WORKSPACE_PROFILE.username;
 
@@ -120,62 +152,55 @@ export function getStoredWorkspaceProfile(): WorkspaceProfile {
     return cachedWorkspaceProfileSnapshot;
   }
 
-  const rawValue = window.localStorage.getItem(WORKSPACE_PROFILE_STORAGE_KEY);
+  const guestSession = getStoredGuestSession();
 
-  if (rawValue === cachedWorkspaceProfileRaw) {
+  if (!guestSession) {
+    cachedWorkspaceProfileKey = null;
+    cachedWorkspaceProfileRaw = null;
+    cachedWorkspaceProfileSnapshot = DEFAULT_WORKSPACE_PROFILE;
     return cachedWorkspaceProfileSnapshot;
   }
 
-  if (!rawValue) {
-    const nextProfile = createDefaultWorkspaceProfile();
-    cachedWorkspaceProfileRaw = null;
-    cachedWorkspaceProfileSnapshot = nextProfile;
-    return nextProfile;
+  const storageKey = getWorkspaceProfileStorageKey(guestSession.id);
+  const rawValue = window.localStorage.getItem(storageKey);
+
+  if (storageKey === cachedWorkspaceProfileKey && rawValue === cachedWorkspaceProfileRaw) {
+    return cachedWorkspaceProfileSnapshot;
   }
 
-  try {
-    const parsed: unknown = JSON.parse(rawValue);
+  if (rawValue) {
+    const nextProfile = parseWorkspaceProfile(rawValue);
 
-    if (
-      isRecord(parsed) &&
-      typeof parsed.fullName === "string" &&
-      typeof parsed.title === "string" &&
-      typeof parsed.username === "string" &&
-      typeof parsed.email === "string" &&
-      typeof parsed.initials === "string" &&
-      parsed.fullName.trim().length > 0 &&
-      parsed.username.trim().length > 0 &&
-      parsed.email.trim().length > 0 &&
-      parsed.initials.trim().length > 0
-    ) {
-      const nextProfile = {
-        fullName: parsed.fullName.trim(),
-        title: parsed.title.trim() || "Guest",
-        username: parsed.username.trim(),
-        email: normalizeStoredEmail(parsed.email),
-        initials: parsed.initials.trim(),
-      };
-
-      if (isLegacyWorkspaceProfile(nextProfile)) {
-        cachedWorkspaceProfileRaw = rawValue;
-        cachedWorkspaceProfileSnapshot = DEFAULT_WORKSPACE_PROFILE;
-        return DEFAULT_WORKSPACE_PROFILE;
-      }
-
+    if (nextProfile) {
+      cachedWorkspaceProfileKey = storageKey;
       cachedWorkspaceProfileRaw = rawValue;
       cachedWorkspaceProfileSnapshot = nextProfile;
-
       return nextProfile;
     }
-  } catch {
-    const nextProfile = createDefaultWorkspaceProfile();
-    cachedWorkspaceProfileRaw = null;
-    cachedWorkspaceProfileSnapshot = nextProfile;
-    return nextProfile;
   }
 
-  const nextProfile = createDefaultWorkspaceProfile();
-  cachedWorkspaceProfileRaw = null;
+  const legacyRawValue = window.localStorage.getItem(
+    LEGACY_WORKSPACE_PROFILE_STORAGE_KEY,
+  );
+
+  if (legacyRawValue) {
+    const legacyProfile = parseWorkspaceProfile(legacyRawValue);
+
+    if (legacyProfile) {
+      const migratedRaw = JSON.stringify(legacyProfile);
+      window.localStorage.setItem(storageKey, migratedRaw);
+      cachedWorkspaceProfileKey = storageKey;
+      cachedWorkspaceProfileRaw = migratedRaw;
+      cachedWorkspaceProfileSnapshot = legacyProfile;
+      return legacyProfile;
+    }
+  }
+
+  const nextProfile = createProfileFromSession();
+  const nextRaw = JSON.stringify(nextProfile);
+  window.localStorage.setItem(storageKey, nextRaw);
+  cachedWorkspaceProfileKey = storageKey;
+  cachedWorkspaceProfileRaw = nextRaw;
   cachedWorkspaceProfileSnapshot = nextProfile;
   return nextProfile;
 }
@@ -183,14 +208,24 @@ export function getStoredWorkspaceProfile(): WorkspaceProfile {
 export function setStoredWorkspaceProfile(
   values: WorkspaceProfileFormValues,
 ): WorkspaceProfile {
+  const currentSession = getStoredGuestSession();
+
+  if (!currentSession) {
+    return DEFAULT_WORKSPACE_PROFILE;
+  }
+
   const currentProfile = getStoredWorkspaceProfile();
   const nextProfile = toWorkspaceProfile(values, currentProfile.email);
+  const storageKey = getWorkspaceProfileStorageKey(currentSession.id);
+  const nextRaw = JSON.stringify(nextProfile);
 
-  window.localStorage.setItem(
-    WORKSPACE_PROFILE_STORAGE_KEY,
-    JSON.stringify(nextProfile),
-  );
+  window.localStorage.setItem(storageKey, nextRaw);
+  cachedWorkspaceProfileKey = storageKey;
+  cachedWorkspaceProfileRaw = nextRaw;
+  cachedWorkspaceProfileSnapshot = nextProfile;
+
   setStoredGuestSession({
+    ...currentSession,
     name: nextProfile.fullName,
     initials: nextProfile.initials,
   });
@@ -200,30 +235,29 @@ export function setStoredWorkspaceProfile(
 }
 
 function subscribe(callback: () => void): () => void {
-  const handleStorage = (event: StorageEvent) => {
-    if (
-      event.key === WORKSPACE_PROFILE_STORAGE_KEY ||
-      event.key === GUEST_SESSION_STORAGE_KEY ||
-      event.key === null
-    ) {
-      cachedWorkspaceProfileRaw = undefined;
-      callback();
-    }
-  };
-
-  const handleChange = () => {
-    cachedWorkspaceProfileRaw = undefined;
+  const handleInvalidate = () => {
+    invalidateWorkspaceProfileCache();
     callback();
   };
 
+  const handleStorage = (event: StorageEvent) => {
+    if (
+      event.key === null ||
+      event.key === LEGACY_WORKSPACE_PROFILE_STORAGE_KEY ||
+      event.key?.startsWith(`${WORKSPACE_PROFILE_STORAGE_KEY_PREFIX}:`) === true
+    ) {
+      handleInvalidate();
+    }
+  };
+
   window.addEventListener("storage", handleStorage);
-  window.addEventListener(WORKSPACE_PROFILE_CHANGE_EVENT, handleChange);
-  window.addEventListener(GUEST_SESSION_CHANGE_EVENT, handleChange);
+  window.addEventListener(WORKSPACE_PROFILE_CHANGE_EVENT, handleInvalidate);
+  window.addEventListener(GUEST_SESSION_CHANGE_EVENT, handleInvalidate);
 
   return () => {
     window.removeEventListener("storage", handleStorage);
-    window.removeEventListener(WORKSPACE_PROFILE_CHANGE_EVENT, handleChange);
-    window.removeEventListener(GUEST_SESSION_CHANGE_EVENT, handleChange);
+    window.removeEventListener(WORKSPACE_PROFILE_CHANGE_EVENT, handleInvalidate);
+    window.removeEventListener(GUEST_SESSION_CHANGE_EVENT, handleInvalidate);
   };
 }
 

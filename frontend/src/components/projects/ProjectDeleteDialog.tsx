@@ -65,12 +65,12 @@ export function ProjectDeleteDialog({
   return typeof document !== "undefined"
     ? createPortal(
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/30 px-4 py-6"
+          className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-foreground/30 px-4 py-4 sm:items-center sm:py-6"
           onClick={onClose}
         >
           <div
             onClick={(event) => event.stopPropagation()}
-            className="w-full max-w-[420px] rounded-2xl border border-border bg-background p-5 shadow-[0_24px_60px_rgba(0,0,0,0.12)]"
+            className="my-auto w-full max-w-[420px] max-h-[calc(100dvh-1rem)] overflow-y-auto rounded-2xl border border-border bg-background p-5 shadow-[0_24px_60px_rgba(0,0,0,0.12)]"
           >
             <h2 className="text-[18px] font-semibold leading-5 text-foreground">
               Delete Project

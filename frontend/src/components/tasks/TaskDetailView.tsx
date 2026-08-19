@@ -284,7 +284,7 @@ export function TaskDetailView({ taskId }: { taskId: string }) {
 
   return (
     <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-4">
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
         <Link
           href="/tasks"
           className="inline-flex items-center gap-2 text-[12px] font-medium text-muted transition-colors hover:text-foreground"
@@ -296,7 +296,7 @@ export function TaskDetailView({ taskId }: { taskId: string }) {
         <button
           type="button"
           onClick={() => setIsEditOpen(true)}
-          className="inline-flex h-8 items-center gap-1.5 rounded-[4px] border border-border bg-background px-3 text-[12px] font-medium text-foreground transition-colors hover:bg-surface"
+          className="inline-flex h-9 items-center gap-1.5 rounded-[4px] border border-border bg-background px-3 text-[12px] font-medium text-foreground transition-colors hover:bg-surface sm:h-8"
         >
           <Edit3 className="h-3.5 w-3.5" aria-hidden="true" />
           Edit Task

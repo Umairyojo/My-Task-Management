@@ -2,15 +2,8 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Check, ChevronDown, LogOut, MoonStar, Settings2, SunMedium } from "lucide-react";
+import { ChevronDown, LogOut, Settings2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import {
-  applyColorMode,
-  colorModeOptions,
-  getStoredColorMode,
-  type ColorMode,
-  setStoredColorMode,
-} from "./color-mode";
 import { clearStoredGuestSession } from "@/components/auth/guest-session";
 import { useWorkspaceProfile } from "@/components/auth/workspace-profile";
 
@@ -18,13 +11,8 @@ export function SidebarProfileMenu() {
   const router = useRouter();
   const profile = useWorkspaceProfile();
   const [isOpen, setIsOpen] = useState(false);
-  const [colorMode, setColorMode] = useState<ColorMode>(() => getStoredColorMode());
   const menuRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
-
-  useEffect(() => {
-    applyColorMode(colorMode);
-  }, [colorMode]);
 
   useEffect(() => {
     if (!isOpen) {
@@ -59,11 +47,6 @@ export function SidebarProfileMenu() {
       document.removeEventListener("keydown", handleKeyDown);
     };
   }, [isOpen]);
-
-  const handleSelectColorMode = (nextMode: ColorMode) => {
-    setColorMode(nextMode);
-    setStoredColorMode(nextMode);
-  };
 
   const handleLogout = () => {
     clearStoredGuestSession();
@@ -123,55 +106,6 @@ export function SidebarProfileMenu() {
             <Settings2 className="h-3.5 w-3.5 text-muted" aria-hidden="true" />
             Profile settings
           </Link>
-
-          <div className="mt-2 px-2 py-1 text-[10px] font-medium uppercase tracking-[0.18em] text-muted">
-            Color Mode
-          </div>
-
-          <div className="space-y-1">
-            {colorModeOptions.map((option) => {
-              const selected = option.value === colorMode;
-              const Icon = option.value === "light" ? SunMedium : MoonStar;
-
-              return (
-                <button
-                  key={option.value}
-                  type="button"
-                  role="menuitemradio"
-                  aria-checked={selected}
-                  onClick={() => handleSelectColorMode(option.value)}
-                  className={[
-                    "flex w-full items-center gap-3 rounded-[8px] px-2 py-2 text-left transition-colors",
-                    selected ? "bg-surface" : "hover:bg-surface",
-                  ].join(" ")}
-                >
-                  <span className="flex h-7 w-7 items-center justify-center rounded-[8px] border border-border bg-background text-foreground">
-                    <Icon className="h-3.5 w-3.5" aria-hidden="true" />
-                  </span>
-
-                  <span className="min-w-0 flex-1">
-                    <span className="block text-[12px] font-medium leading-4 text-foreground">
-                      {option.label}
-                    </span>
-                    <span className="block text-[10px] leading-4 text-muted">
-                      {option.description}
-                    </span>
-                  </span>
-
-                  <span
-                    className={[
-                      "inline-flex h-4 w-4 items-center justify-center rounded-[3px] border",
-                      selected
-                        ? "border-foreground bg-foreground text-background"
-                        : "border-border bg-background text-transparent",
-                    ].join(" ")}
-                  >
-                    <Check className="h-3 w-3" aria-hidden="true" />
-                  </span>
-                </button>
-              );
-            })}
-          </div>
 
           <div className="my-2 h-px bg-border" />
 

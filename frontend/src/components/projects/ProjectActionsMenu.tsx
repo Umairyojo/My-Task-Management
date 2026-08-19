@@ -79,7 +79,7 @@ export function ProjectActionsMenu({
       ? createPortal(
           <div
             ref={menuRef}
-            className="w-36 rounded-md border border-border bg-background p-1 shadow-sm"
+            className="w-36 max-w-[calc(100vw-1rem)] rounded-md border border-border bg-background p-1 shadow-sm"
             style={{
               position: "fixed",
               top: menuPosition.top,

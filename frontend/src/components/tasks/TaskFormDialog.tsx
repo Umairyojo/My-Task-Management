@@ -151,14 +151,14 @@ export function TaskFormDialog({
 
   return typeof document !== "undefined"
     ? createPortal(
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/30 px-4 py-6"
-      onClick={onClose}
-    >
+      <div
+        className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-foreground/30 px-4 py-4 sm:items-center sm:py-6"
+        onClick={onClose}
+      >
       <form
         onSubmit={handleSubmit}
         onClick={(event) => event.stopPropagation()}
-        className="w-full max-w-[560px] rounded-2xl border border-border bg-background p-5 shadow-[0_24px_60px_rgba(0,0,0,0.12)]"
+        className="my-auto w-full max-w-[560px] max-h-[calc(100dvh-1rem)] overflow-y-auto rounded-2xl border border-border bg-background p-5 shadow-[0_24px_60px_rgba(0,0,0,0.12)]"
       >
         <div className="flex items-start justify-between gap-3">
           <div>
