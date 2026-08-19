@@ -1,0 +1,191 @@
+"use client";
+
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { Check, ChevronDown, LogOut, MoonStar, Settings2, SunMedium } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import {
+  applyColorMode,
+  colorModeOptions,
+  getStoredColorMode,
+  type ColorMode,
+  setStoredColorMode,
+} from "./color-mode";
+import { clearStoredGuestSession } from "@/components/auth/guest-session";
+import { useWorkspaceProfile } from "@/components/auth/workspace-profile";
+
+export function SidebarProfileMenu() {
+  const router = useRouter();
+  const profile = useWorkspaceProfile();
+  const [isOpen, setIsOpen] = useState(false);
+  const [colorMode, setColorMode] = useState<ColorMode>(() => getStoredColorMode());
+  const menuRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    applyColorMode(colorMode);
+  }, [colorMode]);
+
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+
+    const handlePointerDown = (event: PointerEvent) => {
+      const target = event.target;
+
+      if (
+        target instanceof Node &&
+        menuRef.current &&
+        triggerRef.current &&
+        !menuRef.current.contains(target) &&
+        !triggerRef.current.contains(target)
+      ) {
+        setIsOpen(false);
+      }
+    };
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener("pointerdown", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("pointerdown", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isOpen]);
+
+  const handleSelectColorMode = (nextMode: ColorMode) => {
+    setColorMode(nextMode);
+    setStoredColorMode(nextMode);
+  };
+
+  const handleLogout = () => {
+    clearStoredGuestSession();
+    setIsOpen(false);
+    router.replace("/login");
+  };
+
+  return (
+    <div className="relative">
+      <button
+        ref={triggerRef}
+        type="button"
+        onClick={() => setIsOpen((current) => !current)}
+        aria-haspopup="menu"
+        aria-expanded={isOpen}
+        className="flex w-full items-center gap-2 rounded-[10px] border border-border bg-background px-2.5 py-2 text-left transition-colors hover:bg-surface"
+      >
+        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[8px] border border-border bg-surface text-[12px] font-semibold text-foreground">
+          {profile.initials}
+        </div>
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-[12px] font-semibold leading-4 text-foreground">
+            {profile.fullName}
+          </p>
+          <p className="truncate text-[10px] leading-4 text-muted">{profile.title}</p>
+        </div>
+        <ChevronDown className="h-3.5 w-3.5 shrink-0 text-muted" aria-hidden="true" />
+      </button>
+
+      {isOpen ? (
+        <div
+          ref={menuRef}
+          role="menu"
+          aria-label="Profile"
+          className="absolute left-0 top-full z-20 mt-2 w-[248px] rounded-[12px] border border-border bg-background p-2 shadow-[0_18px_40px_rgba(0,0,0,0.12)]"
+        >
+          <div className="flex items-center gap-3 rounded-[10px] border border-border bg-surface px-3 py-2">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] border border-border bg-background text-[12px] font-semibold text-foreground">
+              {profile.initials}
+            </div>
+            <div className="min-w-0">
+              <p className="truncate text-[12px] font-semibold leading-4 text-foreground">
+                {profile.fullName}
+              </p>
+              <p className="truncate text-[10px] leading-4 text-muted">
+                {profile.email}
+              </p>
+            </div>
+          </div>
+
+          <Link
+            href="/settings/profile"
+            role="menuitem"
+            onClick={() => setIsOpen(false)}
+            className="mt-2 flex h-9 items-center gap-2 rounded-[8px] px-2 text-[12px] font-medium text-foreground transition-colors hover:bg-surface"
+          >
+            <Settings2 className="h-3.5 w-3.5 text-muted" aria-hidden="true" />
+            Profile settings
+          </Link>
+
+          <div className="mt-2 px-2 py-1 text-[10px] font-medium uppercase tracking-[0.18em] text-muted">
+            Color Mode
+          </div>
+
+          <div className="space-y-1">
+            {colorModeOptions.map((option) => {
+              const selected = option.value === colorMode;
+              const Icon = option.value === "light" ? SunMedium : MoonStar;
+
+              return (
+                <button
+                  key={option.value}
+                  type="button"
+                  role="menuitemradio"
+                  aria-checked={selected}
+                  onClick={() => handleSelectColorMode(option.value)}
+                  className={[
+                    "flex w-full items-center gap-3 rounded-[8px] px-2 py-2 text-left transition-colors",
+                    selected ? "bg-surface" : "hover:bg-surface",
+                  ].join(" ")}
+                >
+                  <span className="flex h-7 w-7 items-center justify-center rounded-[8px] border border-border bg-background text-foreground">
+                    <Icon className="h-3.5 w-3.5" aria-hidden="true" />
+                  </span>
+
+                  <span className="min-w-0 flex-1">
+                    <span className="block text-[12px] font-medium leading-4 text-foreground">
+                      {option.label}
+                    </span>
+                    <span className="block text-[10px] leading-4 text-muted">
+                      {option.description}
+                    </span>
+                  </span>
+
+                  <span
+                    className={[
+                      "inline-flex h-4 w-4 items-center justify-center rounded-[3px] border",
+                      selected
+                        ? "border-foreground bg-foreground text-background"
+                        : "border-border bg-background text-transparent",
+                    ].join(" ")}
+                  >
+                    <Check className="h-3 w-3" aria-hidden="true" />
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="my-2 h-px bg-border" />
+
+          <button
+            type="button"
+            role="menuitem"
+            onClick={handleLogout}
+            className="flex h-9 w-full items-center gap-2 rounded-[8px] px-2 text-left text-[12px] font-medium text-red-600 transition-colors hover:bg-red-50"
+          >
+            <LogOut className="h-3.5 w-3.5" aria-hidden="true" />
+            Logout
+          </button>
+        </div>
+      ) : null}
+    </div>
+  );
+}
