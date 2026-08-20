@@ -1,7 +1,9 @@
 import { NextRequest } from "next/server";
 
 const BACKEND_BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
+  process.env.BACKEND_URL ??
+  process.env.NEXT_PUBLIC_API_BASE_URL ??
+  "http://localhost:3001";
 
 async function proxyToBackend(request: NextRequest): Promise<Response> {
   const backendResponse = await fetch(new URL("/tasks", BACKEND_BASE_URL), {
