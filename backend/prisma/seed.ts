@@ -192,59 +192,55 @@ function getSeedProjectId(taskId: string): string {
 }
 
 async function main(): Promise<void> {
-  await prisma.$transaction(
-    seedProjects.map((project) =>
-      prisma.project.upsert({
-        where: {
-          id: project.id,
-        },
-        update: {
-          name: project.name,
-          priority: project.priority,
-          leadName: project.leadName,
-          dueDate: project.dueDate,
-        },
-        create: {
-          id: project.id,
-          name: project.name,
-          priority: project.priority,
-          leadName: project.leadName,
-          dueDate: project.dueDate,
-        },
-      }),
-    ),
-  );
+  for (const project of seedProjects) {
+    await prisma.project.upsert({
+      where: {
+        id: project.id,
+      },
+      update: {
+        name: project.name,
+        priority: project.priority,
+        leadName: project.leadName,
+        dueDate: project.dueDate,
+      },
+      create: {
+        id: project.id,
+        name: project.name,
+        priority: project.priority,
+        leadName: project.leadName,
+        dueDate: project.dueDate,
+      },
+    });
+  }
 
-  await prisma.$transaction(
-    seedTasks.map((task) =>
-      prisma.task.upsert({
-        where: {
-          id: task.id,
-        },
-        update: {
-          title: task.title,
-          status: task.status,
-          priority: task.priority,
-          assigneeName: task.assigneeName,
-          assigneeInitials: task.assigneeInitials,
-          dueDate: task.dueDate,
-          labels: [...task.labels],
-          projectId: getSeedProjectId(task.id),
-        },
-        create: {
-          id: task.id,
-          title: task.title,
-          status: task.status,
-          priority: task.priority,
-          assigneeName: task.assigneeName,
-          assigneeInitials: task.assigneeInitials,
-          dueDate: task.dueDate,
-          labels: [...task.labels],
-          projectId: getSeedProjectId(task.id),
-        },
-      }),
-    ),
-  );
+  for (const task of seedTasks) {
+    await prisma.task.upsert({
+      where: {
+        id: task.id,
+      },
+      update: {
+        title: task.title,
+        status: task.status,
+        priority: task.priority,
+        assigneeName: task.assigneeName,
+        assigneeInitials: task.assigneeInitials,
+        dueDate: task.dueDate,
+        labels: [...task.labels],
+        projectId: getSeedProjectId(task.id),
+      },
+      create: {
+        id: task.id,
+        title: task.title,
+        status: task.status,
+        priority: task.priority,
+        assigneeName: task.assigneeName,
+        assigneeInitials: task.assigneeInitials,
+        dueDate: task.dueDate,
+        labels: [...task.labels],
+        projectId: getSeedProjectId(task.id),
+      },
+    });
+  }
 }
 
 main()
