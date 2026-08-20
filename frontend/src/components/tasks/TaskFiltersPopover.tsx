@@ -55,7 +55,7 @@ function OptionRow({
     <button
       type="button"
       onClick={onClick}
-      className="flex h-8 w-full items-center justify-between rounded-[4px] px-2 text-left text-[12px] text-foreground transition-colors hover:bg-surface"
+      className="flex h-8 w-full items-center justify-between rounded-[6px] px-2 text-left text-[12px] text-foreground transition-colors hover:bg-surface"
       aria-pressed={selected}
     >
       <span className="truncate">{label}</span>
@@ -241,7 +241,7 @@ export function TaskFiltersPopover({
       ref={popoverRef}
       role="dialog"
       aria-label="Task filters"
-      className="fixed z-50 flex max-h-[calc(100dvh-1rem)] w-[calc(100vw-1rem)] max-w-none flex-col overflow-hidden rounded-[8px] border border-border bg-background shadow-[0_18px_40px_rgba(0,0,0,0.12)] sm:w-[332px] sm:max-w-[332px]"
+      className="fixed z-50 flex max-h-[calc(100dvh-1rem)] w-[calc(100vw-1rem)] max-w-none flex-col overflow-hidden rounded-[8px] border border-border bg-background shadow-[0_16px_36px_rgba(0,0,0,0.12)] sm:w-[332px] sm:max-w-[332px]"
       style={{
         top: position.top,
         left: position.left,
@@ -273,7 +273,7 @@ export function TaskFiltersPopover({
         )}
       </div>
 
-      <div className="min-h-0 flex-1 space-y-2 overflow-y-auto overscroll-contain p-3">
+      <div className="min-h-0 flex-1 space-y-2 overflow-y-auto overscroll-contain p-2.5">
         <Section
           title="Status"
           open={sectionOpen.status}

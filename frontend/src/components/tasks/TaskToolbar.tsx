@@ -208,8 +208,8 @@ export function TaskToolbar({
   };
 
   return (
-    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
-      <h1 className="text-[18px] font-semibold leading-none tracking-[-0.02em] text-foreground sm:text-[20px]">
+    <div className="flex flex-col gap-2.5 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
+      <h1 className="text-[17px] font-semibold leading-5 tracking-[-0.02em] text-foreground sm:text-[18px]">
         Tasks
       </h1>
 
@@ -283,22 +283,20 @@ export function TaskToolbar({
                   ref={fieldsPopoverRef}
                   role="dialog"
                   aria-label="Task fields"
-                  className="fixed z-50 flex max-h-[calc(100dvh-1rem)] flex-col overflow-hidden rounded-lg border border-border bg-background p-3 shadow-sm"
+                  className="fixed z-50 flex max-h-[calc(100dvh-1rem)] flex-col overflow-hidden rounded-[8px] border border-border bg-background p-2.5 shadow-[0_16px_36px_rgba(0,0,0,0.12)]"
                   style={{
                     top: fieldsPopoverPosition.top,
                     left: fieldsPopoverPosition.left,
                     right: fieldsPopoverPosition.right,
-                    width:
-                      fieldsPopoverPosition.width !== undefined
-                        ? `${fieldsPopoverPosition.width}px`
-                        : "auto",
-                    maxWidth:
-                      fieldsPopoverPosition.width !== undefined
-                        ? `${fieldsPopoverPosition.width}px`
-                        : undefined,
+                    width: fieldsPopoverPosition.right
+                      ? "auto"
+                      : `${fieldsPopoverPosition.width ?? 264}px`,
+                    maxWidth: fieldsPopoverPosition.right
+                      ? "calc(100vw - 1rem)"
+                      : `${fieldsPopoverPosition.width ?? 264}px`,
                   }}
                 >
-                  <div className="flex rounded-md border border-border bg-surface p-0.5 text-[12px] font-medium text-muted">
+                  <div className="flex rounded-[6px] border border-border bg-surface p-0.5 text-[11px] font-medium text-muted">
                     <button
                       type="button"
                       aria-pressed={viewMode === "list"}
@@ -331,7 +329,7 @@ export function TaskToolbar({
                     </button>
                   </div>
 
-                  <div className="mt-3 min-h-0 space-y-1 overflow-y-auto">
+                  <div className="mt-2.5 min-h-0 space-y-1 overflow-y-auto">
                     {taskFieldOptions.map((option) => {
                       const checked = fieldVisibility[option.key];
 
@@ -346,7 +344,7 @@ export function TaskToolbar({
                               [option.key]: !current[option.key],
                             }))
                           }
-                          className="flex h-8 w-full items-center justify-between rounded-md px-2 text-[12px] text-foreground transition-colors hover:bg-surface"
+                          className="flex h-8 w-full items-center justify-between rounded-[6px] px-2 text-[12px] text-foreground transition-colors hover:bg-surface"
                         >
                           <span className="truncate">{option.label}</span>
                           <span

@@ -25,11 +25,11 @@ export function TaskBoardColumn({
   fieldVisibility,
 }: TaskBoardColumnProps) {
   return (
-    <section className="flex w-[289px] shrink-0 flex-col rounded-lg border border-border bg-surface">
-      <header className="flex h-11 items-center justify-between gap-3 border-b border-border px-3">
+    <section className="flex w-[289px] shrink-0 flex-col rounded-[8px] border border-border bg-surface">
+      <header className="flex h-10 items-center justify-between gap-3 border-b border-border px-3">
         <div className="flex min-w-0 items-center gap-1.5">
           <GripVertical className="h-4 w-4 shrink-0 text-muted" aria-hidden="true" />
-          <h2 className="truncate text-[12px] font-medium leading-4 text-foreground">
+          <h2 className="truncate text-[11px] font-medium leading-4 text-foreground">
             {title}
           </h2>
         </div>
@@ -53,7 +53,7 @@ export function TaskBoardColumn({
         </div>
       </header>
 
-      <div className="space-y-2 p-3">
+      <div className="space-y-1.5 p-2.5">
         {tasks.map((task) => (
           <TaskCard
             key={task.id}

@@ -47,7 +47,7 @@ export function TaskCard({
       tabIndex={0}
       onClick={handleOpenDetail}
       onKeyDown={handleKeyDown}
-      className="cursor-pointer rounded-lg border border-border bg-background px-3 py-3 outline-none transition-colors hover:border-foreground/20 hover:bg-surface/40 focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+      className="cursor-pointer rounded-[8px] border border-border bg-background px-3 py-2.5 outline-none transition-colors hover:border-foreground/20 hover:bg-surface/40 focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2 focus-visible:ring-offset-background"
     >
       <div className="flex items-start justify-between gap-3">
         <h3 className="min-w-0 flex-1 text-[12px] font-medium leading-4 text-foreground">
@@ -64,7 +64,7 @@ export function TaskCard({
       </div>
 
       {fieldVisibility.priority || fieldVisibility.status ? (
-        <div className="mt-3 flex flex-wrap items-center gap-2">
+        <div className="mt-2.5 flex flex-wrap items-center gap-2">
           {fieldVisibility.priority ? (
             <PriorityIndicator priority={task.priority} />
           ) : null}
@@ -79,7 +79,7 @@ export function TaskCard({
       {fieldVisibility.members || fieldVisibility.dueDate ? (
         <div
           className={[
-            "mt-3 flex items-center gap-3",
+            "mt-2.5 flex items-center gap-3",
             fieldVisibility.members && fieldVisibility.dueDate
               ? "justify-between"
               : "justify-start",
@@ -102,7 +102,7 @@ export function TaskCard({
       ) : null}
 
       {fieldVisibility.labels && task.labels.length > 0 ? (
-        <div className="mt-3 flex flex-wrap gap-1.5">
+        <div className="mt-2.5 flex flex-wrap gap-1.5">
           {task.labels.map((label) => (
             <span
               key={`${task.id}-${label}`}

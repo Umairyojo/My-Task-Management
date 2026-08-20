@@ -29,9 +29,9 @@ export function TaskSection({
   showActions = true,
 }: TaskSectionProps) {
   return (
-    <section className="space-y-1.5">
-      <div className="flex h-7 items-center gap-1.5 rounded-md px-1 text-[12px] font-medium text-foreground">
-        <ChevronDown className="h-4 w-4 text-muted" aria-hidden="true" />
+    <section className="space-y-1">
+      <div className="flex h-6 items-center gap-1.5 rounded-md px-1 text-[11px] font-medium text-foreground">
+        <ChevronDown className="h-3.5 w-3.5 text-muted" aria-hidden="true" />
         <h2>{title}</h2>
       </div>
       <TaskTable

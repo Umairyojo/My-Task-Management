@@ -30,12 +30,12 @@ export function AppShell({ children }: AppShellProps) {
             onClick={() => setMobileSidebarOpenPath(null)}
           />
           <div className="relative z-10 flex h-full w-64 flex-col bg-sidebar">
-            <div className="flex h-14 items-center justify-end border-b border-border px-4">
+            <div className="flex h-12 items-center justify-end border-b border-border px-3.5">
               <button
                 type="button"
                 onClick={() => setMobileSidebarOpenPath(null)}
                 aria-label="Close navigation"
-                className="inline-flex h-9 w-9 items-center justify-center rounded-[4px] border border-border bg-background text-foreground"
+                className="inline-flex h-8 w-8 items-center justify-center rounded-[4px] border border-border bg-background text-foreground"
               >
                 <X className="h-4 w-4" aria-hidden="true" />
               </button>
@@ -48,19 +48,19 @@ export function AppShell({ children }: AppShellProps) {
       ) : null}
 
       <main className="flex min-w-0 flex-1 flex-col overflow-hidden bg-background">
-        <div className="flex h-14 items-center justify-between border-b border-border px-4 lg:hidden">
+        <div className="flex h-12 items-center justify-between border-b border-border px-3.5 lg:hidden">
           <button
             type="button"
             onClick={() => setMobileSidebarOpenPath(pathname)}
             aria-label="Open navigation"
-            className="inline-flex h-9 w-9 items-center justify-center rounded-[4px] border border-border bg-background text-foreground"
+            className="inline-flex h-8 w-8 items-center justify-center rounded-[4px] border border-border bg-background text-foreground"
           >
             <Menu className="h-4 w-4" aria-hidden="true" />
           </button>
-          <span className="text-[12px] font-medium text-muted">Menu</span>
+          <span className="text-[11px] font-medium text-muted">Menu</span>
         </div>
 
-        <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-x-hidden px-4 py-4 sm:px-6 sm:py-6 lg:px-6 lg:py-6">
+        <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-x-hidden px-4 py-4 sm:px-5 sm:py-5 lg:px-6 lg:py-6">
           {children}
         </div>
       </main>

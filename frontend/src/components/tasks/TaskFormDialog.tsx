@@ -158,11 +158,11 @@ export function TaskFormDialog({
       <form
         onSubmit={handleSubmit}
         onClick={(event) => event.stopPropagation()}
-        className="my-auto w-full max-w-[560px] max-h-[calc(100dvh-1rem)] overflow-y-auto rounded-2xl border border-border bg-background p-5 shadow-[0_24px_60px_rgba(0,0,0,0.12)]"
+        className="my-auto w-full max-w-[540px] max-h-[calc(100dvh-1rem)] overflow-y-auto rounded-[16px] border border-border bg-background p-4 shadow-[0_18px_44px_rgba(0,0,0,0.12)]"
       >
         <div className="flex items-start justify-between gap-3">
           <div>
-            <h2 className="text-[18px] font-semibold leading-5 text-foreground">
+            <h2 className="text-[17px] font-semibold leading-5 text-foreground">
               {title}
             </h2>
             <p className="mt-1 text-[12px] leading-4 text-muted">
@@ -179,7 +179,7 @@ export function TaskFormDialog({
           </button>
         </div>
 
-        <div className="mt-5 grid gap-4">
+        <div className="mt-4 grid gap-3.5">
           <label className="grid gap-1.5 text-[12px] font-medium text-foreground">
             Title
             <input
@@ -302,7 +302,7 @@ export function TaskFormDialog({
           </p>
         ) : null}
 
-        <div className="mt-5 flex items-center justify-end gap-2">
+        <div className="mt-4 flex items-center justify-end gap-2">
           <button
             type="button"
             onClick={onClose}

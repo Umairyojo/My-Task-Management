@@ -62,9 +62,9 @@ export function SidebarProfileMenu() {
         onClick={() => setIsOpen((current) => !current)}
         aria-haspopup="menu"
         aria-expanded={isOpen}
-        className="flex w-full items-center gap-2 rounded-[10px] border border-border bg-background px-2.5 py-2 text-left transition-colors hover:bg-surface"
+        className="flex w-full items-center gap-2 rounded-[8px] border border-border bg-background px-2.5 py-1.5 text-left transition-colors hover:bg-surface"
       >
-        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[8px] border border-border bg-surface text-[12px] font-semibold text-foreground">
+        <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-[8px] border border-border bg-surface text-[11px] font-semibold text-foreground">
           {profile.initials}
         </div>
         <div className="min-w-0 flex-1">
@@ -81,10 +81,10 @@ export function SidebarProfileMenu() {
           ref={menuRef}
           role="menu"
           aria-label="Profile"
-          className="absolute left-0 top-full z-20 mt-2 w-[248px] rounded-[12px] border border-border bg-background p-2 shadow-[0_18px_40px_rgba(0,0,0,0.12)]"
+          className="absolute left-0 top-full z-20 mt-2 w-[232px] rounded-[10px] border border-border bg-background p-1.5 shadow-[0_16px_36px_rgba(0,0,0,0.12)]"
         >
-          <div className="flex items-center gap-3 rounded-[10px] border border-border bg-surface px-3 py-2">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] border border-border bg-background text-[12px] font-semibold text-foreground">
+          <div className="flex items-center gap-2.5 rounded-[8px] border border-border bg-surface px-2.5 py-2">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[8px] border border-border bg-background text-[12px] font-semibold text-foreground">
               {profile.initials}
             </div>
             <div className="min-w-0">
@@ -101,19 +101,19 @@ export function SidebarProfileMenu() {
             href="/settings/profile"
             role="menuitem"
             onClick={() => setIsOpen(false)}
-            className="mt-2 flex h-9 items-center gap-2 rounded-[8px] px-2 text-[12px] font-medium text-foreground transition-colors hover:bg-surface"
+            className="mt-1.5 flex h-8 items-center gap-2 rounded-[8px] px-2 text-[12px] font-medium text-foreground transition-colors hover:bg-surface"
           >
             <Settings2 className="h-3.5 w-3.5 text-muted" aria-hidden="true" />
             Profile settings
           </Link>
 
-          <div className="my-2 h-px bg-border" />
+          <div className="my-1.5 h-px bg-border" />
 
           <button
             type="button"
             role="menuitem"
             onClick={handleLogout}
-            className="flex h-9 w-full items-center gap-2 rounded-[8px] px-2 text-left text-[12px] font-medium text-red-600 transition-colors hover:bg-red-50"
+            className="flex h-8 w-full items-center gap-2 rounded-[8px] px-2 text-left text-[12px] font-medium text-red-600 transition-colors hover:bg-red-50"
           >
             <LogOut className="h-3.5 w-3.5" aria-hidden="true" />
             Logout

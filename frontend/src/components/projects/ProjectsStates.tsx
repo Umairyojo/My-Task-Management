@@ -5,31 +5,31 @@ import { AlertCircle, Plus, RefreshCcw } from "lucide-react";
 export function ProjectsLoadingState() {
   return (
     <div className="overflow-x-auto pb-1">
-      <div className="min-w-[720px] overflow-hidden rounded-[10px] border border-border bg-background">
-      <div className="bg-surface px-4 py-2">
-        <div className="grid grid-cols-[36%_18%_20%_18%_8%] gap-3">
-          {Array.from({ length: 5 }).map((_, index) => (
+      <div className="min-w-[720px] overflow-hidden rounded-[8px] border border-border bg-background">
+        <div className="bg-surface px-4 py-2">
+          <div className="grid grid-cols-[36%_18%_20%_18%_8%] gap-3">
+            {Array.from({ length: 5 }).map((_, index) => (
+              <div
+                key={index}
+                className="h-3.5 rounded-full bg-border/70 animate-pulse"
+              />
+            ))}
+          </div>
+        </div>
+        <div className="space-y-0">
+          {Array.from({ length: 4 }).map((_, index) => (
             <div
               key={index}
-              className="h-3.5 rounded-full bg-border/70 animate-pulse"
-            />
+              className="grid grid-cols-[36%_18%_20%_18%_8%] gap-3 border-t border-border px-4 py-2"
+            >
+              <div className="h-3.5 rounded-full bg-surface animate-pulse" />
+              <div className="h-5 w-16 rounded-full bg-surface animate-pulse" />
+              <div className="h-5 w-20 rounded-full bg-surface animate-pulse" />
+              <div className="h-3.5 w-16 rounded-full bg-surface animate-pulse" />
+              <div className="justify-self-end h-6 w-6 rounded-md bg-surface animate-pulse" />
+            </div>
           ))}
         </div>
-      </div>
-      <div className="space-y-0">
-        {Array.from({ length: 4 }).map((_, index) => (
-          <div
-            key={index}
-            className="grid grid-cols-[36%_18%_20%_18%_8%] gap-3 border-t border-border px-4 py-3"
-          >
-            <div className="h-3.5 rounded-full bg-surface animate-pulse" />
-            <div className="h-5 w-16 rounded-full bg-surface animate-pulse" />
-            <div className="h-5 w-20 rounded-full bg-surface animate-pulse" />
-            <div className="h-3.5 w-16 rounded-full bg-surface animate-pulse" />
-            <div className="justify-self-end h-6 w-6 rounded-md bg-surface animate-pulse" />
-          </div>
-        ))}
-      </div>
       </div>
     </div>
   );
@@ -42,7 +42,7 @@ export function ProjectsEmptyState({
 }) {
   return (
     <div className="flex min-h-0 min-w-0 flex-1 items-start pt-4 sm:pt-6">
-      <div className="rounded-lg border border-border bg-surface px-4 py-3 text-[13px] text-muted">
+      <div className="rounded-[8px] border border-border bg-surface px-4 py-3 text-[13px] text-muted">
         <p>No projects yet.</p>
         <button
           type="button"
@@ -66,7 +66,7 @@ export function ProjectsErrorState({
 }) {
   return (
     <div className="flex min-h-0 min-w-0 flex-1 items-start pt-4 sm:pt-6">
-      <div className="flex max-w-[420px] items-start gap-3 rounded-lg border border-border bg-background px-4 py-3">
+      <div className="flex max-w-[420px] items-start gap-3 rounded-[8px] border border-border bg-background px-4 py-3">
         <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-muted" aria-hidden="true" />
         <div className="min-w-0">
           <p className="text-[13px] font-medium text-foreground">Unable to load projects.</p>

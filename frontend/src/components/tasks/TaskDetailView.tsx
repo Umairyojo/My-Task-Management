@@ -73,12 +73,12 @@ function DetailCard({
   value: ReactNode;
 }) {
   return (
-    <div className="rounded-[10px] border border-border bg-surface px-4 py-3">
+    <div className="rounded-[8px] border border-border bg-surface px-3 py-2.5">
       <div className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.16em] text-muted">
         {icon}
         <span>{label}</span>
       </div>
-      <div className="mt-2 text-[13px] leading-5 text-foreground">{value}</div>
+      <div className="mt-1.5 text-[12px] leading-5 text-foreground">{value}</div>
     </div>
   );
 }
@@ -86,7 +86,7 @@ function DetailCard({
 function TaskDetailLoadingState() {
   return (
     <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_280px]">
-      <div className="rounded-[12px] border border-border bg-background p-5">
+      <div className="rounded-[10px] border border-border bg-background p-4">
         <div className="h-3.5 w-24 rounded-full bg-surface animate-pulse" />
         <div className="mt-3 h-8 w-72 max-w-full rounded-full bg-surface animate-pulse" />
         <div className="mt-5 grid gap-3 sm:grid-cols-2">
@@ -116,8 +116,8 @@ function TaskDetailErrorState({
   onRetry: () => void;
 }) {
   return (
-    <div className="rounded-[12px] border border-border bg-background px-5 py-4">
-      <p className="text-[13px] font-medium text-foreground">Unable to load task.</p>
+    <div className="rounded-[10px] border border-border bg-background px-4 py-3.5">
+      <p className="text-[12px] font-medium text-foreground">Unable to load task.</p>
       <p className="mt-1 text-[12px] leading-4 text-muted">{message}</p>
       <button
         type="button"
@@ -132,8 +132,8 @@ function TaskDetailErrorState({
 
 function TaskDetailNotFoundState() {
   return (
-    <div className="rounded-[12px] border border-border bg-background px-5 py-4">
-      <p className="text-[13px] font-medium text-foreground">Task not found.</p>
+    <div className="rounded-[10px] border border-border bg-background px-4 py-3.5">
+      <p className="text-[12px] font-medium text-foreground">Task not found.</p>
       <p className="mt-1 text-[12px] leading-4 text-muted">
         The requested task may have been deleted or the link is invalid.
       </p>
@@ -304,13 +304,13 @@ export function TaskDetailView({ taskId }: { taskId: string }) {
       </div>
 
       <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_280px]">
-        <section className="rounded-[12px] border border-border bg-background p-5">
+        <section className="rounded-[10px] border border-border bg-background p-4">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div className="min-w-0">
               <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted">
                 Task Detail
               </p>
-              <h1 className="mt-2 text-[24px] font-semibold leading-tight tracking-[-0.03em] text-foreground">
+              <h1 className="mt-2 text-[22px] font-semibold leading-tight tracking-[-0.03em] text-foreground">
                 {task.title}
               </h1>
             </div>
@@ -323,7 +323,7 @@ export function TaskDetailView({ taskId }: { taskId: string }) {
             </div>
           </div>
 
-          <div className="mt-5 grid gap-3 sm:grid-cols-2">
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
             <DetailCard
               icon={<Tag className="h-3.5 w-3.5" aria-hidden="true" />}
               label="Priority"
@@ -356,7 +356,7 @@ export function TaskDetailView({ taskId }: { taskId: string }) {
             />
           </div>
 
-          <div className="mt-5 rounded-[10px] border border-border bg-surface px-4 py-3">
+          <div className="mt-4 rounded-[10px] border border-border bg-surface px-4 py-3">
             <div className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.16em] text-muted">
               <Tag className="h-3.5 w-3.5" aria-hidden="true" />
               <span>Labels</span>
@@ -379,7 +379,7 @@ export function TaskDetailView({ taskId }: { taskId: string }) {
         </section>
 
         <aside className="space-y-4">
-          <section className="rounded-[12px] border border-border bg-background p-4">
+          <section className="rounded-[10px] border border-border bg-background p-4">
             <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-muted">
               Activity
             </p>
@@ -395,7 +395,7 @@ export function TaskDetailView({ taskId }: { taskId: string }) {
             </dl>
           </section>
 
-          <section className="rounded-[12px] border border-border bg-surface px-4 py-3 text-[12px] leading-5 text-muted">
+          <section className="rounded-[10px] border border-border bg-surface px-4 py-3 text-[12px] leading-5 text-muted">
             <p className="font-medium text-foreground">Detail view</p>
             <p className="mt-1">
               Update the task from here using the existing edit form. Title,

@@ -28,15 +28,15 @@ interface TasksNoMatchStateProps {
 
 function ListSkeleton() {
   return (
-    <div className="flex w-full min-w-[760px] flex-col gap-3">
+    <div className="flex w-full min-w-[760px] flex-col gap-2.5">
       {taskListSections.map((section) => (
         <section key={section.key} className="space-y-1.5">
-          <div className="flex h-7 items-center gap-1.5 px-1">
+          <div className="flex h-6 items-center gap-1.5 px-1">
             <div className="h-4 w-4 rounded-full bg-surface animate-pulse" />
             <div className="h-3 w-20 rounded-full bg-surface animate-pulse" />
           </div>
 
-          <div className="overflow-hidden rounded-[10px] border border-border bg-background">
+          <div className="overflow-hidden rounded-[8px] border border-border bg-background">
             <div className="border-b border-border bg-surface/80 px-4 py-2">
               <div className="grid grid-cols-[46%_16%_18%_14%_6%] gap-3">
                 <div className="h-3.5 rounded-full bg-border/70 animate-pulse" />
@@ -51,7 +51,7 @@ function ListSkeleton() {
               {Array.from({ length: 2 }).map((_, index) => (
                 <div
                   key={`${section.key}-skeleton-${index}`}
-                  className="grid grid-cols-[46%_16%_18%_14%_6%] gap-3 border-t border-border px-4 py-2.5"
+                  className="grid grid-cols-[46%_16%_18%_14%_6%] gap-3 border-t border-border px-4 py-2"
                 >
                   <div className="h-3.5 rounded-full bg-surface animate-pulse" />
                   <div className="h-5 w-16 rounded-full bg-surface animate-pulse" />
@@ -62,7 +62,7 @@ function ListSkeleton() {
               ))}
             </div>
 
-            <div className="border-t border-border px-4 py-2.5">
+            <div className="border-t border-border px-4 py-2">
               <div className="h-3.5 w-20 rounded-full bg-surface animate-pulse" />
             </div>
           </div>
@@ -74,13 +74,13 @@ function ListSkeleton() {
 
 function BoardSkeleton() {
   return (
-    <div className="flex w-max min-w-full gap-3">
+    <div className="flex w-max min-w-full gap-2.5">
       {taskBoardSections.map((section) => (
         <section
           key={section.key}
-          className="flex w-[289px] shrink-0 flex-col rounded-lg border border-border bg-surface"
+          className="flex w-[289px] shrink-0 flex-col rounded-[8px] border border-border bg-surface"
         >
-          <div className="flex h-11 items-center justify-between gap-3 border-b border-border px-3">
+          <div className="flex h-10 items-center justify-between gap-3 border-b border-border px-3">
             <div className="flex min-w-0 items-center gap-1.5">
               <div className="h-4 w-4 rounded-full bg-border/70 animate-pulse" />
               <div className="h-3.5 w-16 rounded-full bg-border/70 animate-pulse" />
@@ -91,11 +91,11 @@ function BoardSkeleton() {
             </div>
           </div>
 
-          <div className="space-y-2 p-3">
+          <div className="space-y-1.5 p-2.5">
             {Array.from({ length: 2 }).map((_, index) => (
               <div
                 key={`${section.key}-card-${index}`}
-                className="rounded-lg border border-border bg-background px-3 py-3"
+                className="rounded-[8px] border border-border bg-background px-3 py-2.5"
               >
                 <div className="h-3.5 w-36 rounded-full bg-surface animate-pulse" />
                 <div className="mt-3 flex items-center justify-between gap-3">
@@ -131,8 +131,8 @@ export function TasksEmptyState({
   onAction,
 }: TasksEmptyStateProps) {
   return (
-    <div className="flex min-h-0 min-w-0 flex-1 items-start pt-6">
-      <div className="rounded-lg border border-border bg-surface px-4 py-3 text-[13px] text-muted">
+    <div className="flex min-h-0 min-w-0 flex-1 items-start pt-4">
+      <div className="rounded-[8px] border border-border bg-surface px-4 py-3 text-[13px] text-muted">
         <p>{message}</p>
         {actionLabel && onAction ? (
           <button
@@ -150,8 +150,8 @@ export function TasksEmptyState({
 
 export function TasksErrorState({ onRetry }: TasksErrorStateProps) {
   return (
-    <div className="flex min-h-0 min-w-0 flex-1 items-start pt-6">
-      <div className="flex max-w-[360px] items-start gap-3 rounded-lg border border-border bg-background px-4 py-3">
+    <div className="flex min-h-0 min-w-0 flex-1 items-start pt-4">
+      <div className="flex max-w-[360px] items-start gap-3 rounded-[8px] border border-border bg-background px-4 py-3">
         <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-muted" aria-hidden="true" />
         <div className="min-w-0">
           <p className="text-[13px] font-medium text-foreground">Unable to load tasks.</p>
@@ -177,8 +177,8 @@ export function TasksNoMatchState({
   actions,
 }: TasksNoMatchStateProps) {
   return (
-    <div className="flex min-h-0 min-w-0 flex-1 items-start pt-6">
-      <div className="rounded-lg border border-border bg-surface px-4 py-3 text-[13px] text-muted">
+    <div className="flex min-h-0 min-w-0 flex-1 items-start pt-4">
+      <div className="rounded-[8px] border border-border bg-surface px-4 py-3 text-[13px] text-muted">
         <p>{message}</p>
         <div className="mt-3 flex flex-wrap gap-2">
           {actions.map((action) => (

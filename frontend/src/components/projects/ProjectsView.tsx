@@ -125,9 +125,9 @@ export function ProjectsView() {
   }, [deleteTarget]);
 
   return (
-    <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-3.5">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
-        <h1 className="text-[18px] font-semibold leading-none tracking-[-0.02em] text-foreground sm:text-[20px]">
+    <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-3">
+      <div className="flex flex-col gap-2.5 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
+        <h1 className="text-[17px] font-semibold leading-5 tracking-[-0.02em] text-foreground sm:text-[18px]">
           Projects
         </h1>
 
@@ -152,14 +152,14 @@ export function ProjectsView() {
         <ProjectsEmptyState onAction={handleCreateProject} />
       ) : (
         <div className="overflow-x-auto pb-1">
-          <table className="min-w-[720px] overflow-hidden rounded-[10px] border border-border bg-background border-collapse">
+          <table className="min-w-[720px] overflow-hidden rounded-[8px] border border-border bg-background border-collapse">
             <thead className="bg-surface">
-              <tr className="text-left text-[11px] font-medium text-muted">
-                <th className="w-[36%] px-4 py-2 font-medium">Project</th>
-                <th className="w-[18%] px-4 py-2 font-medium">Priority</th>
-                <th className="w-[22%] px-4 py-2 font-medium">Lead</th>
-                <th className="w-[18%] px-4 py-2 font-medium">Due Date</th>
-                <th className="w-[6%] px-4 py-2 font-medium text-right">Actions</th>
+              <tr className="text-left text-[10px] font-medium uppercase tracking-[0.12em] text-muted">
+                <th className="w-[36%] px-4 py-2 font-medium normal-case tracking-normal">Project</th>
+                <th className="w-[18%] px-4 py-2 font-medium normal-case tracking-normal">Priority</th>
+                <th className="w-[22%] px-4 py-2 font-medium normal-case tracking-normal">Lead</th>
+                <th className="w-[18%] px-4 py-2 font-medium normal-case tracking-normal">Due Date</th>
+                <th className="w-[6%] px-4 py-2 font-medium normal-case tracking-normal text-right">Actions</th>
               </tr>
             </thead>
             <tbody>

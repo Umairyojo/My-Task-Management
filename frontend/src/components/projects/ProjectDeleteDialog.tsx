@@ -70,12 +70,12 @@ export function ProjectDeleteDialog({
         >
           <div
             onClick={(event) => event.stopPropagation()}
-            className="my-auto w-full max-w-[420px] max-h-[calc(100dvh-1rem)] overflow-y-auto rounded-2xl border border-border bg-background p-5 shadow-[0_24px_60px_rgba(0,0,0,0.12)]"
+            className="my-auto w-full max-w-[400px] max-h-[calc(100dvh-1rem)] overflow-y-auto rounded-[16px] border border-border bg-background p-4 shadow-[0_18px_44px_rgba(0,0,0,0.12)]"
           >
-            <h2 className="text-[18px] font-semibold leading-5 text-foreground">
+            <h2 className="text-[17px] font-semibold leading-5 text-foreground">
               Delete Project
             </h2>
-            <p className="mt-2 text-[13px] leading-5 text-muted">
+            <p className="mt-2 text-[12px] leading-5 text-muted">
               Are you sure you want to delete{" "}
               <span className="font-medium text-foreground">{projectName}</span>?
             </p>
@@ -86,7 +86,7 @@ export function ProjectDeleteDialog({
               </p>
             ) : null}
 
-            <div className="mt-5 flex items-center justify-end gap-2">
+            <div className="mt-4 flex items-center justify-end gap-2">
               <button
                 type="button"
                 onClick={onClose}

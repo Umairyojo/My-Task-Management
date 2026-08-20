@@ -64,7 +64,7 @@ function ProfileFieldRow({
   children: ReactNode;
 }) {
   return (
-    <div className="grid min-h-[72px] grid-cols-[minmax(0,1fr)_auto] items-center gap-4 px-4 py-4">
+    <div className="grid min-h-[64px] grid-cols-[minmax(0,1fr)_auto] items-center gap-4 px-4 py-3.5">
       <SectionLabel title={title} description={description} />
       <div className="flex items-center justify-end">{children}</div>
     </div>
@@ -173,11 +173,11 @@ export function ProfileView() {
         <span className="text-[12px] font-medium text-muted">Profile</span>
       </div>
 
-      <div className="min-w-0 flex-1 overflow-y-auto bg-background px-4 py-4 sm:px-6 sm:py-8">
+      <div className="min-w-0 flex-1 overflow-y-auto bg-background px-4 py-4 sm:px-6 sm:py-6">
         <div className="mx-auto flex w-full max-w-[640px] flex-col">
           <div className="flex items-start justify-between gap-3">
             <div>
-              <h1 className="text-[18px] font-medium leading-6 tracking-[-0.03em] text-foreground sm:text-[20px]">
+              <h1 className="text-[17px] font-medium leading-6 tracking-[-0.03em] text-foreground sm:text-[18px]">
                 Profile
               </h1>
               <p className="mt-1 text-[12px] leading-4 text-muted">
@@ -218,12 +218,12 @@ export function ProfileView() {
             )}
           </div>
 
-          <section className="mt-5 overflow-hidden rounded-[12px] border border-border bg-background sm:mt-7">
+          <section className="mt-5 overflow-hidden rounded-[10px] border border-border bg-background sm:mt-6">
             <ProfileFieldRow title="Profile picture">
               <ProfilePictureBadge initials={profile.initials} />
             </ProfileFieldRow>
 
-            <div className="border-t border-border px-4 py-4">
+            <div className="border-t border-border px-4 py-3.5">
               <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4">
                 <SectionLabel title="Email" />
 
@@ -284,13 +284,13 @@ export function ProfileView() {
             </div>
           </section>
 
-          <section className="mt-10">
-            <h2 className="text-[15px] font-medium leading-5 text-foreground">
+          <section className="mt-8">
+            <h2 className="text-[14px] font-medium leading-5 text-foreground">
               Workspace access
             </h2>
 
-            <div className="mt-4 overflow-hidden rounded-[12px] border border-border bg-background">
-              <div className="flex items-center justify-between gap-4 px-4 py-4">
+            <div className="mt-3 overflow-hidden rounded-[10px] border border-border bg-background">
+              <div className="flex items-center justify-between gap-4 px-4 py-3.5">
                 <div className="flex items-center gap-2 text-muted">
                   <Users className="h-4 w-4 shrink-0" aria-hidden="true" />
                   <p className="text-[12px] leading-4">

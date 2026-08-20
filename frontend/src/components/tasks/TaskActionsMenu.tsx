@@ -79,7 +79,7 @@ export function TaskActionsMenu({
       ? createPortal(
           <div
             ref={menuRef}
-            className="w-36 max-w-[calc(100vw-1rem)] rounded-md border border-border bg-background p-1 shadow-sm"
+            className="w-36 max-w-[calc(100vw-1rem)] rounded-[8px] border border-border bg-background p-1 shadow-[0_12px_28px_rgba(0,0,0,0.12)]"
             style={{
               position: "fixed",
               top: menuPosition.top,
@@ -93,7 +93,7 @@ export function TaskActionsMenu({
                 setOpen(false);
                 onEdit();
               }}
-              className="flex h-8 w-full items-center rounded-[4px] px-2 text-left text-[12px] font-medium text-foreground transition-colors hover:bg-surface"
+              className="flex h-8 w-full items-center rounded-[6px] px-2 text-left text-[12px] font-medium text-foreground transition-colors hover:bg-surface"
             >
               Edit
             </button>
@@ -103,7 +103,7 @@ export function TaskActionsMenu({
                 setOpen(false);
                 onDelete();
               }}
-              className="flex h-8 w-full items-center rounded-[4px] px-2 text-left text-[12px] font-medium text-red-600 transition-colors hover:bg-red-50"
+              className="flex h-8 w-full items-center rounded-[6px] px-2 text-left text-[12px] font-medium text-red-600 transition-colors hover:bg-red-50"
             >
               Delete
             </button>
@@ -120,7 +120,7 @@ export function TaskActionsMenu({
         aria-haspopup="menu"
         aria-expanded={open}
         onClick={() => setOpen((current) => !current)}
-        className="inline-flex h-6 w-6 items-center justify-center rounded-md text-muted transition-colors hover:bg-surface hover:text-foreground"
+        className="inline-flex h-6 w-6 items-center justify-center rounded-[4px] text-muted transition-colors hover:bg-surface hover:text-foreground"
       >
         <MoreHorizontal className="h-3.5 w-3.5" aria-hidden="true" />
         <span className="sr-only">Open actions for {taskTitle}</span>

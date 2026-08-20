@@ -29,7 +29,7 @@ export function TaskListView({
   return (
     <div className="flex min-h-0 min-w-0 flex-1 flex-col">
       <div className="min-h-0 min-w-0 overflow-x-auto pb-1">
-        <div className="flex w-full min-w-[760px] flex-col gap-3">
+        <div className="flex w-full min-w-[760px] flex-col gap-2.5">
           {taskListSections.map((section) => {
             const sectionTasks = tasks.filter((task) => task.status === section.key);
 
@@ -40,15 +40,15 @@ export function TaskListView({
             return (
               <TaskSection
                 key={section.key}
-              status={section.key}
-              title={section.title}
-              tasks={sectionTasks}
-              onAddTask={onAddTask}
-              onEditTask={onEditTask}
-              onDeleteTask={onDeleteTask}
-              fieldVisibility={fieldVisibility}
-              showAddTask={showAddTask}
-              showActions={showActions}
+                status={section.key}
+                title={section.title}
+                tasks={sectionTasks}
+                onAddTask={onAddTask}
+                onEditTask={onEditTask}
+                onDeleteTask={onDeleteTask}
+                fieldVisibility={fieldVisibility}
+                showAddTask={showAddTask}
+                showActions={showActions}
             />
           );
         })}

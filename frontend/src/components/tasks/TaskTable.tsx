@@ -38,28 +38,28 @@ export function TaskTable({
     (showActions ? 1 : 0);
 
   return (
-    <div className="overflow-hidden rounded-[10px] border border-border bg-background">
+    <div className="overflow-hidden rounded-[8px] border border-border bg-background">
       <table className="min-w-full border-collapse">
         <thead className="bg-surface">
-          <tr className="text-left text-[11px] font-medium text-muted">
-            <th className="w-[46%] px-4 py-2 font-medium">Task</th>
+          <tr className="text-left text-[10px] font-medium uppercase tracking-[0.12em] text-muted">
+            <th className="w-[46%] px-4 py-2 font-medium normal-case tracking-normal">Task</th>
             {fieldVisibility.priority ? (
-              <th className="w-[12%] px-4 py-2 font-medium">Priority</th>
+              <th className="w-[12%] px-4 py-2 font-medium normal-case tracking-normal">Priority</th>
             ) : null}
             {fieldVisibility.members ? (
-              <th className="w-[16%] px-4 py-2 font-medium">Members</th>
+              <th className="w-[16%] px-4 py-2 font-medium normal-case tracking-normal">Members</th>
             ) : null}
             {fieldVisibility.dueDate ? (
-              <th className="w-[12%] px-4 py-2 font-medium">Due Date</th>
+              <th className="w-[12%] px-4 py-2 font-medium normal-case tracking-normal">Due Date</th>
             ) : null}
             {fieldVisibility.labels ? (
-              <th className="w-[14%] px-4 py-2 font-medium">Labels</th>
+              <th className="w-[14%] px-4 py-2 font-medium normal-case tracking-normal">Labels</th>
             ) : null}
             {fieldVisibility.status ? (
-              <th className="w-[10%] px-4 py-2 font-medium">Status</th>
+              <th className="w-[10%] px-4 py-2 font-medium normal-case tracking-normal">Status</th>
             ) : null}
             {showActions ? (
-              <th className="w-[6%] px-4 py-2 font-medium text-right">Actions</th>
+              <th className="w-[6%] px-4 py-2 font-medium normal-case tracking-normal text-right">Actions</th>
             ) : null}
           </tr>
         </thead>
@@ -79,7 +79,7 @@ export function TaskTable({
         {showAddTask ? (
           <tfoot>
             <tr className="border-t border-border">
-              <td colSpan={visibleColumnCount} className="px-4 py-2.5">
+              <td colSpan={visibleColumnCount} className="px-4 py-2">
                 <button
                   type="button"
                   onClick={() => onAddTask(status)}
