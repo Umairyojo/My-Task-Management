@@ -47,7 +47,7 @@ export function TaskBoardColumn({
           onDropTask(taskId, status);
         }
       }}
-      className="flex w-[289px] shrink-0 flex-col rounded-[8px] border border-border bg-surface"
+      className="flex w-[min(289px,calc(100vw-2rem))] shrink-0 flex-col rounded-[8px] border border-border bg-surface sm:w-[289px]"
     >
       <header className="flex h-10 items-center justify-between gap-3 border-b border-border px-3">
         <div className="flex min-w-0 items-center gap-1.5">

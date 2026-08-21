@@ -56,7 +56,7 @@ export function Sidebar() {
                     className={[
                       "flex h-9 items-center gap-2 rounded-[6px] px-3 text-[12px] font-medium transition-colors",
                       active
-                        ? "bg-accent-soft text-foreground ring-1 ring-inset ring-accent/20"
+                        ? "bg-[var(--app-selected-bg)] text-foreground ring-1 ring-inset ring-[var(--app-selected-border)]"
                         : "text-muted hover:bg-background hover:text-foreground",
                     ].join(" ")}
                     href={item.href}

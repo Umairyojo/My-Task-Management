@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Script from "next/script";
 import type { ReactNode } from "react";
@@ -22,6 +22,11 @@ export const metadata: Metadata = {
   description: "Task management workspace",
 };
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -42,7 +47,7 @@ export default function RootLayout({
           {getColorPaletteBootstrapScript()}
         </Script>
       </head>
-      <body className="min-h-dvh bg-background text-foreground antialiased">
+      <body className="min-h-dvh min-w-0 w-full bg-background text-foreground antialiased">
         <Providers>{children}</Providers>
       </body>
     </html>

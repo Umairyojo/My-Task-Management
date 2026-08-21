@@ -61,14 +61,14 @@ export function LoginView() {
     <div className="flex min-h-dvh items-center justify-center bg-background px-4 py-8">
       <div className="flex w-full flex-col items-center">
         <div className="flex w-full justify-center">
-          <div className="flex items-center gap-2">
+          <div className="flex h-6 items-center gap-2">
             <img
               src="/pyramid.svg"
               alt=""
               aria-hidden="true"
-              className="h-7 w-7 rounded-[8px]"
+              className="h-6 w-6 shrink-0"
             />
-            <p className="text-[12px] font-semibold leading-none tracking-[-0.02em] text-foreground">
+            <p className="text-[18px] font-semibold leading-6 tracking-[-0.03em] text-foreground">
               Pyramid
             </p>
           </div>

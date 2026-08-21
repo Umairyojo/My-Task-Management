@@ -129,7 +129,7 @@ export function ProjectFormDialog({
           <form
             onSubmit={handleSubmit}
             onClick={(event) => event.stopPropagation()}
-            className="my-auto w-full max-w-[540px] max-h-[calc(100dvh-1rem)] overflow-y-auto rounded-[16px] border border-border bg-background p-4 shadow-[0_18px_44px_rgba(0,0,0,0.12)]"
+            className="my-auto w-full max-w-[540px] max-h-[calc(100dvh-2rem)] overflow-y-auto rounded-[16px] border border-border bg-background p-4 shadow-[0_18px_44px_rgba(0,0,0,0.12)]"
           >
             <div className="flex items-start justify-between gap-3">
               <div>

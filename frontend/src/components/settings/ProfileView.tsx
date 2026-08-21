@@ -224,7 +224,7 @@ export function ProfileView() {
   const avatarSource = isEditing ? formValues.avatarUrl ?? profile.avatarUrl : profile.avatarUrl;
 
   return (
-    <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden bg-background">
+    <div className="app-page-canvas flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
       <div className="flex items-center justify-between border-b border-border px-4 py-3 lg:hidden">
         <Link
           href="/tasks"
@@ -236,7 +236,7 @@ export function ProfileView() {
         <span className="text-[12px] font-medium text-muted">Profile</span>
       </div>
 
-      <div className="min-w-0 flex-1 overflow-y-auto bg-background px-4 py-4 sm:px-6 sm:py-6">
+      <div className="min-w-0 flex-1 overflow-y-auto px-4 py-4 sm:px-6 sm:py-6">
         <div className="mx-auto flex w-full max-w-[640px] flex-col">
           <div className="flex items-start justify-between gap-3">
             <div>

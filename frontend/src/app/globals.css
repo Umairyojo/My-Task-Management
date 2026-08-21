@@ -11,6 +11,10 @@
   --accent: #3b82f6;
   --accent-foreground: #ffffff;
   --accent-soft: rgba(59, 130, 246, 0.12);
+  --app-canvas: color-mix(in srgb, var(--accent) 7%, var(--background));
+  --app-canvas-tint: color-mix(in srgb, var(--accent) 15%, transparent);
+  --app-selected-bg: color-mix(in srgb, var(--accent) 14%, var(--background));
+  --app-selected-border: color-mix(in srgb, var(--accent) 32%, var(--border));
 
   --background-light: #ffffff;
   --foreground-light: #171717;
@@ -119,6 +123,8 @@
 html,
 body {
   min-height: 100%;
+  min-width: 0;
+  max-width: 100%;
   overflow-x: hidden;
   width: 100%;
   background: var(--background);
@@ -131,10 +137,16 @@ body {
 }
 
 .app-page-canvas {
-  background-color: var(--background);
-  background-image: radial-gradient(
-    900px circle at 100% -20%,
-    color-mix(in srgb, var(--accent) 14%, transparent),
-    transparent 68%
-  );
+  background-color: var(--app-canvas);
+  background-image:
+    radial-gradient(
+      760px circle at 10% -16%,
+      var(--app-canvas-tint),
+      transparent 62%
+    ),
+    radial-gradient(
+      880px circle at 100% 4%,
+      color-mix(in srgb, var(--accent) 10%, transparent),
+      transparent 66%
+    );
 }
