@@ -13,6 +13,10 @@ interface TaskBoardColumnProps {
   onEditTask: (task: Task) => void;
   onDeleteTask: (task: Task) => void;
   fieldVisibility: TaskFieldVisibility;
+  draggedTaskId: string | null;
+  onDragStartTask: (taskId: string) => void;
+  onDragEndTask: () => void;
+  onDropTask: (taskId: string, status: TaskStatus) => void;
 }
 
 export function TaskBoardColumn({
@@ -23,9 +27,28 @@ export function TaskBoardColumn({
   onEditTask,
   onDeleteTask,
   fieldVisibility,
+  draggedTaskId,
+  onDragStartTask,
+  onDragEndTask,
+  onDropTask,
 }: TaskBoardColumnProps) {
   return (
-    <section className="flex w-[289px] shrink-0 flex-col rounded-[8px] border border-border bg-surface">
+    <section
+      onDragOver={(event) => {
+        event.preventDefault();
+        event.dataTransfer.dropEffect = "move";
+      }}
+      onDrop={(event) => {
+        event.preventDefault();
+
+        const taskId = event.dataTransfer.getData("text/plain");
+
+        if (taskId) {
+          onDropTask(taskId, status);
+        }
+      }}
+      className="flex w-[289px] shrink-0 flex-col rounded-[8px] border border-border bg-surface"
+    >
       <header className="flex h-10 items-center justify-between gap-3 border-b border-border px-3">
         <div className="flex min-w-0 items-center gap-1.5">
           <GripVertical className="h-4 w-4 shrink-0 text-muted" aria-hidden="true" />
@@ -62,6 +85,10 @@ export function TaskBoardColumn({
             onEditTask={onEditTask}
             onDeleteTask={onDeleteTask}
             fieldVisibility={fieldVisibility}
+            draggable
+            isDragging={task.id === draggedTaskId}
+            onDragStart={() => onDragStartTask(task.id)}
+            onDragEnd={() => onDragEndTask()}
           />
         ))}
       </div>

@@ -302,7 +302,7 @@ export function ProjectDetailView({ projectId }: { projectId: string }) {
             <DetailCard
               icon={<Tag className="h-3.5 w-3.5" aria-hidden="true" />}
               label="Priority"
-              value={<PriorityIndicator priority={project.priority} />}
+              value={<PriorityIndicator priority={project.priority} variant="inline" />}
             />
             <DetailCard
               icon={<Users className="h-3.5 w-3.5" aria-hidden="true" />}

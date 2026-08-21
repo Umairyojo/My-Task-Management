@@ -3,7 +3,9 @@ import { Geist, Geist_Mono } from "next/font/google";
 import Script from "next/script";
 import type { ReactNode } from "react";
 import "./globals.css";
+import { getColorPaletteBootstrapScript } from "@/components/layout/color-palette";
 import { getColorModeBootstrapScript } from "@/components/layout/color-mode";
+import { Providers } from "@/components/providers";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -16,7 +18,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "AbleSpace",
+  title: "Pyramid-Ablespace",
   description: "Task management workspace",
 };
 
@@ -36,9 +38,12 @@ export default function RootLayout({
         <Script id="theme-bootstrap" strategy="beforeInteractive">
           {getColorModeBootstrapScript()}
         </Script>
+        <Script id="color-bootstrap" strategy="beforeInteractive">
+          {getColorPaletteBootstrapScript()}
+        </Script>
       </head>
       <body className="min-h-dvh bg-background text-foreground antialiased">
-        {children}
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

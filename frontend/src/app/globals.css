@@ -8,6 +8,9 @@
   --border: #e5e5e5;
   --surface: #f5f5f5;
   --muted: #9ca3af;
+  --accent: #3b82f6;
+  --accent-foreground: #ffffff;
+  --accent-soft: rgba(59, 130, 246, 0.12);
 
   --background-light: #ffffff;
   --foreground-light: #171717;
@@ -22,6 +25,25 @@
   --border-dark: #2a2a2a;
   --surface-dark: #1f1f1f;
   --muted-dark: #a1a1aa;
+
+  --accent-amber: #f59e0b;
+  --accent-amber-foreground: #ffffff;
+  --accent-amber-soft: rgba(245, 158, 11, 0.12);
+  --accent-blue: #3b82f6;
+  --accent-blue-foreground: #ffffff;
+  --accent-blue-soft: rgba(59, 130, 246, 0.12);
+  --accent-pink: #ec4899;
+  --accent-pink-foreground: #ffffff;
+  --accent-pink-soft: rgba(236, 72, 153, 0.12);
+  --accent-rose: #f43f5e;
+  --accent-rose-foreground: #ffffff;
+  --accent-rose-soft: rgba(244, 63, 94, 0.12);
+  --accent-emerald: #10b981;
+  --accent-emerald-foreground: #ffffff;
+  --accent-emerald-soft: rgba(16, 185, 129, 0.12);
+  --accent-black: #111111;
+  --accent-black-foreground: #ffffff;
+  --accent-black-soft: rgba(17, 17, 17, 0.08);
 }
 
 :root[data-theme="light"] {
@@ -44,6 +66,42 @@
   --muted: var(--muted-dark);
 }
 
+:root[data-color="amber"] {
+  --accent: var(--accent-amber);
+  --accent-foreground: var(--accent-amber-foreground);
+  --accent-soft: var(--accent-amber-soft);
+}
+
+:root[data-color="blue"] {
+  --accent: var(--accent-blue);
+  --accent-foreground: var(--accent-blue-foreground);
+  --accent-soft: var(--accent-blue-soft);
+}
+
+:root[data-color="pink"] {
+  --accent: var(--accent-pink);
+  --accent-foreground: var(--accent-pink-foreground);
+  --accent-soft: var(--accent-pink-soft);
+}
+
+:root[data-color="rose"] {
+  --accent: var(--accent-rose);
+  --accent-foreground: var(--accent-rose-foreground);
+  --accent-soft: var(--accent-rose-soft);
+}
+
+:root[data-color="emerald"] {
+  --accent: var(--accent-emerald);
+  --accent-foreground: var(--accent-emerald-foreground);
+  --accent-soft: var(--accent-emerald-soft);
+}
+
+:root[data-color="black"] {
+  --accent: var(--accent-black);
+  --accent-foreground: var(--accent-black-foreground);
+  --accent-soft: var(--accent-black-soft);
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -51,6 +109,9 @@
   --color-border: var(--border);
   --color-surface: var(--surface);
   --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent-soft: var(--accent-soft);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
@@ -67,4 +128,13 @@ body {
 body {
   min-height: 100dvh;
   font-family: var(--font-geist-sans), sans-serif;
+}
+
+.app-page-canvas {
+  background-color: var(--background);
+  background-image: radial-gradient(
+    900px circle at 100% -20%,
+    color-mix(in srgb, var(--accent) 14%, transparent),
+    transparent 68%
+  );
 }

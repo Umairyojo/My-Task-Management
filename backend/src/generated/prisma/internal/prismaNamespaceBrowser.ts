@@ -52,6 +52,9 @@ export const AnyNull = runtime.AnyNull
 
 export const ModelName = {
   Task: 'Task',
+  Subtask: 'Subtask',
+  TaskComment: 'TaskComment',
+  TaskActivity: 'TaskActivity',
   Project: 'Project'
 } as const
 
@@ -76,16 +79,65 @@ export const TaskScalarFieldEnum = {
   title: 'title',
   status: 'status',
   priority: 'priority',
+  description: 'description',
   assigneeName: 'assigneeName',
   assigneeInitials: 'assigneeInitials',
+  startDate: 'startDate',
   dueDate: 'dueDate',
   labels: 'labels',
+  teams: 'teams',
+  resources: 'resources',
+  reporterName: 'reporterName',
+  reporterAvatar: 'reporterAvatar',
   projectId: 'projectId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
 
 export type TaskScalarFieldEnum = (typeof TaskScalarFieldEnum)[keyof typeof TaskScalarFieldEnum]
+
+
+export const SubtaskScalarFieldEnum = {
+  id: 'id',
+  taskId: 'taskId',
+  title: 'title',
+  priority: 'priority',
+  assigneeName: 'assigneeName',
+  assigneeInitials: 'assigneeInitials',
+  dueDate: 'dueDate',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SubtaskScalarFieldEnum = (typeof SubtaskScalarFieldEnum)[keyof typeof SubtaskScalarFieldEnum]
+
+
+export const TaskCommentScalarFieldEnum = {
+  id: 'id',
+  taskId: 'taskId',
+  parentId: 'parentId',
+  authorName: 'authorName',
+  authorEmail: 'authorEmail',
+  authorAvatar: 'authorAvatar',
+  body: 'body',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type TaskCommentScalarFieldEnum = (typeof TaskCommentScalarFieldEnum)[keyof typeof TaskCommentScalarFieldEnum]
+
+
+export const TaskActivityScalarFieldEnum = {
+  id: 'id',
+  taskId: 'taskId',
+  actorName: 'actorName',
+  actorAvatar: 'actorAvatar',
+  type: 'type',
+  message: 'message',
+  createdAt: 'createdAt'
+} as const
+
+export type TaskActivityScalarFieldEnum = (typeof TaskActivityScalarFieldEnum)[keyof typeof TaskActivityScalarFieldEnum]
 
 
 export const ProjectScalarFieldEnum = {

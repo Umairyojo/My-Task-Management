@@ -23,6 +23,21 @@ export * from './enums.js';
  */
 export type Task = Prisma.TaskModel
 /**
+ * Model Subtask
+ * 
+ */
+export type Subtask = Prisma.SubtaskModel
+/**
+ * Model TaskComment
+ * 
+ */
+export type TaskComment = Prisma.TaskCommentModel
+/**
+ * Model TaskActivity
+ * 
+ */
+export type TaskActivity = Prisma.TaskActivityModel
+/**
  * Model Project
  * 
  */

@@ -31,12 +31,15 @@ export const statusFilterOptions: Array<{ value: TaskStatus; label: string }> = 
   { value: "doing", label: "Doing" },
   { value: "completed", label: "Completed" },
   { value: "on-hold", label: "On Hold" },
+  { value: "backlog", label: "Backlog" },
 ];
 
 export const priorityFilterOptions: Array<{ value: TaskPriority; label: string }> = [
+  { value: "urgent", label: "Urgent" },
   { value: "high", label: "High" },
   { value: "medium", label: "Medium" },
   { value: "low", label: "Low" },
+  { value: "no-priority", label: "No Priority" },
 ];
 
 export const dueDateFilterOptions: Array<{ value: DueDateFilter; label: string }> = [

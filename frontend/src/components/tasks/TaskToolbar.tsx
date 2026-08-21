@@ -19,6 +19,7 @@ import {
   Search,
   X,
 } from "lucide-react";
+import { FieldsMark } from "@/components/layout/app-icons";
 import { TaskFiltersPopover } from "./TaskFiltersPopover";
 import { countActiveTaskFilterCategories } from "./task-filters";
 import type { TaskFilterOptions, TaskFilters } from "./task-filters";
@@ -273,6 +274,7 @@ export function TaskToolbar({
             }}
             className="inline-flex h-9 items-center gap-1.5 rounded-[4px] border border-border bg-background px-3 text-[13px] font-medium text-foreground transition-colors hover:bg-surface sm:h-8"
           >
+            <FieldsMark className="h-3.5 w-3.5 shrink-0" />
             <span>Fields</span>
             <ChevronDown className="h-3.5 w-3.5 text-muted" aria-hidden="true" />
           </button>

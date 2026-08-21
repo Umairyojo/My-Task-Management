@@ -59,6 +59,21 @@ function toTaskWriteInput(values: TaskFormValues): TaskWriteInput {
   };
 }
 
+function toTaskWriteInputFromTask(
+  task: Task,
+  nextStatus: TaskStatus = task.status,
+): TaskWriteInput {
+  return {
+    title: task.title,
+    status: nextStatus,
+    priority: task.priority,
+    assigneeName: task.assigneeName ?? "",
+    assigneeInitials: task.assigneeInitials ?? "",
+    dueDate: task.dueDate ?? "",
+    labels: task.labels,
+  };
+}
+
 export function TasksView() {
   const [viewMode, setViewMode] = useState<TaskViewMode>("list");
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -71,6 +86,7 @@ export function TasksView() {
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
   const [taskFormState, setTaskFormState] = useState<TaskFormState | null>(null);
   const [deleteTaskTarget, setDeleteTaskTarget] = useState<Task | null>(null);
+  const [draggedTaskId, setDraggedTaskId] = useState<string | null>(null);
   const requestIdRef = useRef(0);
 
   const filterOptions = useMemo(() => getTaskFilterOptions(tasks), [tasks]);
@@ -187,6 +203,53 @@ export function TasksView() {
     setStatus("ready");
   }, [deleteTaskTarget]);
 
+  const handleDragStartTask = useCallback((taskId: string) => {
+    setDraggedTaskId(taskId);
+  }, []);
+
+  const handleDragEndTask = useCallback(() => {
+    setDraggedTaskId(null);
+  }, []);
+
+  const handleMoveTask = useCallback(
+    async (taskId: string, nextStatus: TaskStatus) => {
+      const currentTask = tasks.find((task) => task.id === taskId);
+
+      if (!currentTask || currentTask.status === nextStatus) {
+        setDraggedTaskId(null);
+        return;
+      }
+
+      const previousTask = currentTask;
+      const optimisticTask: Task = {
+        ...currentTask,
+        status: nextStatus,
+      };
+
+      setTasks((current) =>
+        current.map((task) => (task.id === taskId ? optimisticTask : task)),
+      );
+      setDraggedTaskId(null);
+
+      try {
+        const updatedTask = await updateTask(
+          taskId,
+          toTaskWriteInputFromTask(currentTask, nextStatus),
+        );
+
+        setTasks((current) =>
+          current.map((task) => (task.id === taskId ? updatedTask : task)),
+        );
+      } catch (error) {
+        console.error(error);
+        setTasks((current) =>
+          current.map((task) => (task.id === taskId ? previousTask : task)),
+        );
+      }
+    },
+    [tasks],
+  );
+
   useEffect(() => {
     const timeoutId = window.setTimeout(() => {
       void loadTasks();
@@ -282,15 +345,21 @@ export function TasksView() {
           fieldVisibility={fieldVisibility}
         />
       ) : (
-        <TaskBoardView
-          tasks={visibleTasks}
-          onAddTask={openCreateTask}
-          onEditTask={openEditTask}
-          onDeleteTask={openDeleteTask}
-          hideEmptySections={isCriteriaActive}
-          fieldVisibility={fieldVisibility}
-        />
-      )}
+          <TaskBoardView
+            tasks={visibleTasks}
+            onAddTask={openCreateTask}
+            onEditTask={openEditTask}
+            onDeleteTask={openDeleteTask}
+            draggedTaskId={draggedTaskId}
+            hideEmptySections={isCriteriaActive}
+            fieldVisibility={fieldVisibility}
+            onDragStartTask={handleDragStartTask}
+            onDragEndTask={handleDragEndTask}
+            onMoveTask={(taskId, nextStatus) => {
+              void handleMoveTask(taskId, nextStatus);
+            }}
+          />
+        )}
 
       <TaskFormDialog
         key={

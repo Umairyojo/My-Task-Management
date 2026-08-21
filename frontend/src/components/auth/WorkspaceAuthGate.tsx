@@ -3,8 +3,8 @@
 import type { ReactNode } from "react";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { AppShell } from "@/components/layout/AppShell";
-import { getStoredGuestSession } from "./guest-session";
+import { useSession } from "next-auth/react";
+import { useGuestSession } from "./guest-session";
 
 interface WorkspaceAuthGateProps {
   children: ReactNode;
@@ -22,17 +22,19 @@ function WorkspaceLoadingState() {
 
 export function WorkspaceAuthGate({ children }: WorkspaceAuthGateProps) {
   const router = useRouter();
-  const guestSession = getStoredGuestSession();
+  const { status } = useSession();
+  const guestSession = useGuestSession();
+  const isAuthorized = status === "authenticated" || guestSession !== null;
 
   useEffect(() => {
-    if (!guestSession) {
+    if (status !== "loading" && !isAuthorized) {
       router.replace("/login");
     }
-  }, [guestSession, router]);
+  }, [isAuthorized, router, status]);
 
-  if (!guestSession) {
+  if (!isAuthorized) {
     return <WorkspaceLoadingState />;
   }
 
-  return <AppShell>{children}</AppShell>;
+  return children;
 }

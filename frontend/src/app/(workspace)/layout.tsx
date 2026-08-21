@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 import type { ReactNode } from "react";
+import { AppShell } from "@/components/layout/AppShell";
 
 const WorkspaceAuthGate = dynamic(
   () =>
@@ -18,5 +19,9 @@ interface WorkspaceLayoutProps {
 }
 
 export default function WorkspaceLayout({ children }: WorkspaceLayoutProps) {
-  return <WorkspaceAuthGate>{children}</WorkspaceAuthGate>;
+  return (
+    <WorkspaceAuthGate>
+      <AppShell>{children}</AppShell>
+    </WorkspaceAuthGate>
+  );
 }

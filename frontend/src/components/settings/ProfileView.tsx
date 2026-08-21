@@ -1,39 +1,39 @@
 "use client";
 
 import Link from "next/link";
-import type { ChangeEvent, ReactNode } from "react";
-import { useState } from "react";
-import { ArrowLeft, Pencil, Users } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { clearStoredGuestSession } from "@/components/auth/guest-session";
+import { signOut } from "next-auth/react";
+import type { ChangeEvent, ReactNode } from "react";
+import { useRef, useState } from "react";
+import { ArrowLeft, Pencil, Upload, Users } from "lucide-react";
+import {
+  clearStoredGuestSession,
+} from "@/components/auth/guest-session";
 import {
   setStoredWorkspaceProfile,
+  type WorkspaceProfile,
   type WorkspaceProfileFormValues,
   useWorkspaceProfile,
 } from "@/components/auth/workspace-profile";
+import { Avatar } from "@/components/layout/Avatar";
 
 type ProfileFormState = WorkspaceProfileFormValues;
 
-function createFormState(profile: {
-  fullName: string;
-  title: string;
-  username: string;
-}): ProfileFormState {
+function createFormState(profile: WorkspaceProfile): ProfileFormState {
   return {
     fullName: profile.fullName,
     title: profile.title,
     username: profile.username,
+    avatarUrl: profile.avatarUrl,
   };
 }
 
-function areFormValuesEqual(
-  left: ProfileFormState,
-  right: ProfileFormState,
-): boolean {
+function areFormValuesEqual(left: ProfileFormState, right: ProfileFormState): boolean {
   return (
     left.fullName.trim() === right.fullName.trim() &&
     left.title.trim() === right.title.trim() &&
-    left.username.trim() === right.username.trim()
+    left.username.trim() === right.username.trim() &&
+    left.avatarUrl === right.avatarUrl
   );
 }
 
@@ -114,17 +114,47 @@ function InputPill({
   );
 }
 
-function ProfilePictureBadge({ initials }: { initials: string }) {
-  return (
-    <div className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-full border border-border bg-[radial-gradient(circle_at_25%_20%,#f9a8d4_0%,#c084fc_44%,#60a5fa_100%)] text-[12px] font-semibold text-white shadow-[0_1px_2px_rgba(0,0,0,0.08)]">
-      {initials}
-    </div>
-  );
+function loadImage(source: string): Promise<HTMLImageElement> {
+  return new Promise((resolve, reject) => {
+    const image = new Image();
+
+    image.onload = () => resolve(image);
+    image.onerror = () => reject(new Error("Unable to load selected image."));
+    image.src = source;
+  });
+}
+
+async function resizeImageToSquareDataUrl(file: File): Promise<string> {
+  const source = URL.createObjectURL(file);
+
+  try {
+    const image = await loadImage(source);
+    const size = 256;
+    const canvas = document.createElement("canvas");
+    canvas.width = size;
+    canvas.height = size;
+
+    const context = canvas.getContext("2d");
+
+    if (!context) {
+      throw new Error("Canvas context is unavailable.");
+    }
+
+    const cropSize = Math.min(image.width, image.height);
+    const cropX = (image.width - cropSize) / 2;
+    const cropY = (image.height - cropSize) / 2;
+
+    context.drawImage(image, cropX, cropY, cropSize, cropSize, 0, 0, size, size);
+    return canvas.toDataURL("image/jpeg", 0.9);
+  } finally {
+    URL.revokeObjectURL(source);
+  }
 }
 
 export function ProfileView() {
   const router = useRouter();
   const profile = useWorkspaceProfile();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [formValues, setFormValues] = useState<ProfileFormState>(() =>
     createFormState(profile),
   );
@@ -144,8 +174,33 @@ export function ProfileView() {
       }));
     };
 
+  const handleAvatarButtonClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleAvatarChange = async (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+
+    if (!file || !file.type.startsWith("image/")) {
+      event.target.value = "";
+      return;
+    }
+
+    try {
+      const avatarUrl = await resizeImageToSquareDataUrl(file);
+      setFormValues((current) => ({
+        ...current,
+        avatarUrl,
+      }));
+    } catch {
+      // Ignore invalid images and keep the previous avatar.
+    } finally {
+      event.target.value = "";
+    }
+  };
+
   const handleSave = () => {
-    const nextProfile = setStoredWorkspaceProfile(formValues);
+    const nextProfile = setStoredWorkspaceProfile(formValues, profile);
     setFormValues(createFormState(nextProfile));
     setIsEditing(false);
   };
@@ -156,9 +211,17 @@ export function ProfileView() {
   };
 
   const handleLeaveWorkspace = () => {
+    if (profile.authType === "google") {
+      clearStoredGuestSession();
+      void signOut({ callbackUrl: "/login" });
+      return;
+    }
+
     clearStoredGuestSession();
     router.replace("/login");
   };
+
+  const avatarSource = isEditing ? formValues.avatarUrl ?? profile.avatarUrl : profile.avatarUrl;
 
   return (
     <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden bg-background">
@@ -177,12 +240,9 @@ export function ProfileView() {
         <div className="mx-auto flex w-full max-w-[640px] flex-col">
           <div className="flex items-start justify-between gap-3">
             <div>
-              <h1 className="text-[17px] font-medium leading-6 tracking-[-0.03em] text-foreground sm:text-[18px]">
+              <h1 className="text-[20px] font-medium leading-6 tracking-[-0.03em] text-foreground sm:text-[22px]">
                 Profile
               </h1>
-              <p className="mt-1 text-[12px] leading-4 text-muted">
-                Update the active guest profile used in the sidebar and settings.
-              </p>
             </div>
 
             {isEditing ? (
@@ -220,18 +280,43 @@ export function ProfileView() {
 
           <section className="mt-5 overflow-hidden rounded-[10px] border border-border bg-background sm:mt-6">
             <ProfileFieldRow title="Profile picture">
-              <ProfilePictureBadge initials={profile.initials} />
+              <div className="flex items-center gap-3">
+                <Avatar
+                  alt={profile.fullName}
+                  initials={profile.initials}
+                  src={avatarSource}
+                  sizeClassName="h-10 w-10"
+                  textClassName="text-[12px]"
+                />
+
+                {isEditing ? (
+                  <>
+                    <button
+                      type="button"
+                      onClick={handleAvatarButtonClick}
+                      className="inline-flex h-8 items-center gap-1.5 rounded-[4px] border border-border bg-background px-3 text-[12px] font-medium text-foreground transition-colors hover:bg-surface"
+                    >
+                      <Upload className="h-3.5 w-3.5" aria-hidden="true" />
+                      Upload photo
+                    </button>
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(event) => {
+                        void handleAvatarChange(event);
+                      }}
+                    />
+                  </>
+                ) : null}
+              </div>
             </ProfileFieldRow>
 
             <div className="border-t border-border px-4 py-3.5">
               <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4">
                 <SectionLabel title="Email" />
-
-                <div className="flex items-center gap-2">
-                  <span className="text-[12px] leading-4 text-foreground">
-                    {profile.email}
-                  </span>
-                </div>
+                <span className="text-[12px] leading-4 text-foreground">{profile.email}</span>
               </div>
             </div>
 
@@ -285,7 +370,7 @@ export function ProfileView() {
           </section>
 
           <section className="mt-8">
-            <h2 className="text-[14px] font-medium leading-5 text-foreground">
+            <h2 className="text-[15px] font-medium leading-5 text-foreground">
               Workspace access
             </h2>
 

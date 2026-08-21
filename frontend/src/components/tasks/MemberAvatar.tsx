@@ -1,6 +1,7 @@
 "use client";
 
 import { Plus } from "lucide-react";
+import { Avatar } from "@/components/layout/Avatar";
 
 interface MemberAvatarProps {
   assigneeName?: string | null;
@@ -29,9 +30,12 @@ export function MemberAvatar({
   if (initials) {
     return (
       <div className="flex items-center gap-2">
-        <div className="flex h-6 w-6 items-center justify-center rounded-full bg-surface text-[10px] font-semibold text-foreground ring-1 ring-border">
-          {initials}
-        </div>
+        <Avatar
+          alt={assigneeName ?? initials}
+          initials={initials}
+          sizeClassName="h-6 w-6"
+          textClassName="text-[10px]"
+        />
         {showName && assigneeName ? (
           <span className="text-[12px] font-medium text-foreground">{assigneeName}</span>
         ) : null}

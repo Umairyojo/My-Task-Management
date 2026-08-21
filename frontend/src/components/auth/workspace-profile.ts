@@ -1,32 +1,36 @@
+"use client";
+
 import { useSyncExternalStore } from "react";
 import {
   DEFAULT_GUEST_IDENTITY,
   GUEST_SESSION_CHANGE_EVENT,
-  getStoredGuestSession,
   setStoredGuestSession,
 } from "./guest-session";
+import { useCurrentUserIdentity, type CurrentUserIdentity } from "./current-user";
 
 export interface WorkspaceProfile {
+  authType: "guest" | "google";
+  profileKey: string;
   fullName: string;
   title: string;
   username: string;
   email: string;
   initials: string;
+  avatarUrl: string | null;
 }
 
 export interface WorkspaceProfileFormValues {
   fullName: string;
   title: string;
   username: string;
+  avatarUrl: string | null;
 }
 
 const DEFAULT_WORKSPACE_EMAIL = "guest@ablespace.local";
-const DEFAULT_WORKSPACE_PROFILE: WorkspaceProfile = {
-  fullName: DEFAULT_GUEST_IDENTITY.name,
+const DEFAULT_GUEST_AVATAR_SRC = "/guest-avatar.svg";
+const DEFAULT_WORKSPACE_PROFILE_BASE = {
   title: "Designer",
   username: "Dexuser",
-  email: DEFAULT_WORKSPACE_EMAIL,
-  initials: DEFAULT_GUEST_IDENTITY.initials,
 };
 
 const WORKSPACE_PROFILE_STORAGE_KEY_PREFIX = "task-management-workspace-profile";
@@ -37,7 +41,7 @@ export const WORKSPACE_PROFILE_CHANGE_EVENT =
 
 let cachedWorkspaceProfileKey: string | null | undefined = undefined;
 let cachedWorkspaceProfileRaw: string | null | undefined = undefined;
-let cachedWorkspaceProfileSnapshot: WorkspaceProfile = DEFAULT_WORKSPACE_PROFILE;
+let cachedWorkspaceProfileSnapshot: WorkspaceProfile | null = null;
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
@@ -60,10 +64,6 @@ function getInitials(value: string): string {
     .toUpperCase();
 }
 
-function getWorkspaceProfileStorageKey(sessionId: string): string {
-  return `${WORKSPACE_PROFILE_STORAGE_KEY_PREFIX}:${sessionId}`;
-}
-
 function normalizeStoredEmail(email: string): string {
   const trimmedEmail = email.trim();
 
@@ -74,19 +74,33 @@ function normalizeStoredEmail(email: string): string {
   return trimmedEmail;
 }
 
-function createProfileFromSession(): WorkspaceProfile {
-  const guestSession = getStoredGuestSession();
+function getWorkspaceProfileStorageKey(profileKey: string): string {
+  return `${WORKSPACE_PROFILE_STORAGE_KEY_PREFIX}:${profileKey}`;
+}
 
-  if (!guestSession) {
-    return DEFAULT_WORKSPACE_PROFILE;
+function createDefaultProfile(currentUser: CurrentUserIdentity | null): WorkspaceProfile {
+  if (!currentUser) {
+    return {
+      authType: "guest",
+      profileKey: "guest:anonymous",
+      fullName: DEFAULT_GUEST_IDENTITY.name,
+      title: DEFAULT_WORKSPACE_PROFILE_BASE.title,
+      username: DEFAULT_WORKSPACE_PROFILE_BASE.username,
+      email: DEFAULT_WORKSPACE_EMAIL,
+      initials: DEFAULT_GUEST_IDENTITY.initials,
+      avatarUrl: DEFAULT_GUEST_AVATAR_SRC,
+    };
   }
 
   return {
-    fullName: guestSession.name,
-    title: DEFAULT_WORKSPACE_PROFILE.title,
-    username: DEFAULT_WORKSPACE_PROFILE.username,
-    email: guestSession.email,
-    initials: guestSession.initials,
+    authType: currentUser.authType,
+    profileKey: currentUser.id,
+    fullName: currentUser.name,
+    title: DEFAULT_WORKSPACE_PROFILE_BASE.title,
+    username: DEFAULT_WORKSPACE_PROFILE_BASE.username,
+    email: normalizeStoredEmail(currentUser.email),
+    initials: currentUser.initials,
+    avatarUrl: currentUser.image ?? DEFAULT_GUEST_AVATAR_SRC,
   };
 }
 
@@ -96,6 +110,8 @@ function parseWorkspaceProfile(rawValue: string): WorkspaceProfile | null {
 
     if (
       isRecord(parsed) &&
+      (parsed.authType === "guest" || parsed.authType === "google") &&
+      typeof parsed.profileKey === "string" &&
       typeof parsed.fullName === "string" &&
       typeof parsed.title === "string" &&
       typeof parsed.username === "string" &&
@@ -107,11 +123,17 @@ function parseWorkspaceProfile(rawValue: string): WorkspaceProfile | null {
       parsed.initials.trim().length > 0
     ) {
       return {
+        authType: parsed.authType,
+        profileKey: parsed.profileKey.trim(),
         fullName: parsed.fullName.trim(),
-        title: parsed.title.trim() || DEFAULT_WORKSPACE_PROFILE.title,
+        title: parsed.title.trim() || DEFAULT_WORKSPACE_PROFILE_BASE.title,
         username: parsed.username.trim(),
         email: normalizeStoredEmail(parsed.email),
         initials: parsed.initials.trim().toUpperCase().slice(0, 2),
+        avatarUrl:
+          typeof parsed.avatarUrl === "string" && parsed.avatarUrl.trim().length > 0
+            ? parsed.avatarUrl
+            : null,
       };
     }
   } catch {
@@ -126,46 +148,49 @@ function invalidateWorkspaceProfileCache(): void {
   cachedWorkspaceProfileRaw = undefined;
 }
 
-export function createDefaultWorkspaceProfile(): WorkspaceProfile {
-  return DEFAULT_WORKSPACE_PROFILE;
+export function createDefaultWorkspaceProfile(
+  currentUser: CurrentUserIdentity | null = null,
+): WorkspaceProfile {
+  return createDefaultProfile(currentUser);
 }
 
 export function toWorkspaceProfile(
   values: WorkspaceProfileFormValues,
-  currentEmail: string = DEFAULT_WORKSPACE_EMAIL,
+  currentProfile: WorkspaceProfile,
 ): WorkspaceProfile {
   const fullName = values.fullName.trim() || DEFAULT_GUEST_IDENTITY.name;
-  const title = values.title.trim() || DEFAULT_WORKSPACE_PROFILE.title;
-  const username = values.username.trim() || DEFAULT_WORKSPACE_PROFILE.username;
+  const title = values.title.trim() || DEFAULT_WORKSPACE_PROFILE_BASE.title;
+  const username = values.username.trim() || DEFAULT_WORKSPACE_PROFILE_BASE.username;
 
   return {
+    ...currentProfile,
     fullName,
     title,
     username,
-    email: normalizeStoredEmail(currentEmail),
     initials: getInitials(fullName),
+    avatarUrl: values.avatarUrl?.trim() || currentProfile.avatarUrl,
   };
 }
 
-export function getStoredWorkspaceProfile(): WorkspaceProfile {
+export function getStoredWorkspaceProfile(
+  currentUser: CurrentUserIdentity | null,
+): WorkspaceProfile {
   if (typeof window === "undefined") {
-    return cachedWorkspaceProfileSnapshot;
+    return cachedWorkspaceProfileSnapshot ?? createDefaultProfile(currentUser);
   }
 
-  const guestSession = getStoredGuestSession();
-
-  if (!guestSession) {
+  if (!currentUser) {
     cachedWorkspaceProfileKey = null;
     cachedWorkspaceProfileRaw = null;
-    cachedWorkspaceProfileSnapshot = DEFAULT_WORKSPACE_PROFILE;
+    cachedWorkspaceProfileSnapshot = createDefaultProfile(null);
     return cachedWorkspaceProfileSnapshot;
   }
 
-  const storageKey = getWorkspaceProfileStorageKey(guestSession.id);
+  const storageKey = getWorkspaceProfileStorageKey(currentUser.id);
   const rawValue = window.localStorage.getItem(storageKey);
 
   if (storageKey === cachedWorkspaceProfileKey && rawValue === cachedWorkspaceProfileRaw) {
-    return cachedWorkspaceProfileSnapshot;
+    return cachedWorkspaceProfileSnapshot ?? createDefaultProfile(currentUser);
   }
 
   if (rawValue) {
@@ -179,24 +204,26 @@ export function getStoredWorkspaceProfile(): WorkspaceProfile {
     }
   }
 
-  const legacyRawValue = window.localStorage.getItem(
-    LEGACY_WORKSPACE_PROFILE_STORAGE_KEY,
-  );
+  if (currentUser.authType === "guest") {
+    const legacyRawValue = window.localStorage.getItem(
+      LEGACY_WORKSPACE_PROFILE_STORAGE_KEY,
+    );
 
-  if (legacyRawValue) {
-    const legacyProfile = parseWorkspaceProfile(legacyRawValue);
+    if (legacyRawValue) {
+      const legacyProfile = parseWorkspaceProfile(legacyRawValue);
 
-    if (legacyProfile) {
-      const migratedRaw = JSON.stringify(legacyProfile);
-      window.localStorage.setItem(storageKey, migratedRaw);
-      cachedWorkspaceProfileKey = storageKey;
-      cachedWorkspaceProfileRaw = migratedRaw;
-      cachedWorkspaceProfileSnapshot = legacyProfile;
-      return legacyProfile;
+      if (legacyProfile) {
+        const migratedRaw = JSON.stringify(legacyProfile);
+        window.localStorage.setItem(storageKey, migratedRaw);
+        cachedWorkspaceProfileKey = storageKey;
+        cachedWorkspaceProfileRaw = migratedRaw;
+        cachedWorkspaceProfileSnapshot = legacyProfile;
+        return legacyProfile;
+      }
     }
   }
 
-  const nextProfile = createProfileFromSession();
+  const nextProfile = createDefaultProfile(currentUser);
   const nextRaw = JSON.stringify(nextProfile);
   window.localStorage.setItem(storageKey, nextRaw);
   cachedWorkspaceProfileKey = storageKey;
@@ -207,16 +234,10 @@ export function getStoredWorkspaceProfile(): WorkspaceProfile {
 
 export function setStoredWorkspaceProfile(
   values: WorkspaceProfileFormValues,
+  currentProfile: WorkspaceProfile,
 ): WorkspaceProfile {
-  const currentSession = getStoredGuestSession();
-
-  if (!currentSession) {
-    return DEFAULT_WORKSPACE_PROFILE;
-  }
-
-  const currentProfile = getStoredWorkspaceProfile();
-  const nextProfile = toWorkspaceProfile(values, currentProfile.email);
-  const storageKey = getWorkspaceProfileStorageKey(currentSession.id);
+  const nextProfile = toWorkspaceProfile(values, currentProfile);
+  const storageKey = getWorkspaceProfileStorageKey(nextProfile.profileKey);
   const nextRaw = JSON.stringify(nextProfile);
 
   window.localStorage.setItem(storageKey, nextRaw);
@@ -224,11 +245,15 @@ export function setStoredWorkspaceProfile(
   cachedWorkspaceProfileRaw = nextRaw;
   cachedWorkspaceProfileSnapshot = nextProfile;
 
-  setStoredGuestSession({
-    ...currentSession,
-    name: nextProfile.fullName,
-    initials: nextProfile.initials,
-  });
+  if (currentProfile.authType === "guest") {
+    setStoredGuestSession({
+      id: currentProfile.profileKey.replace(/^guest:/, ""),
+      email: nextProfile.email,
+      name: nextProfile.fullName,
+      initials: nextProfile.initials,
+    });
+  }
+
   window.dispatchEvent(new Event(WORKSPACE_PROFILE_CHANGE_EVENT));
 
   return nextProfile;
@@ -262,9 +287,11 @@ function subscribe(callback: () => void): () => void {
 }
 
 export function useWorkspaceProfile(): WorkspaceProfile {
+  const currentUser = useCurrentUserIdentity();
+
   return useSyncExternalStore(
     subscribe,
-    getStoredWorkspaceProfile,
-    createDefaultWorkspaceProfile,
+    () => getStoredWorkspaceProfile(currentUser),
+    () => createDefaultWorkspaceProfile(currentUser),
   );
 }

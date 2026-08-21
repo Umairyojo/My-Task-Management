@@ -25,9 +25,11 @@ interface TaskFormDialogProps {
 }
 
 const priorityOptions: Array<{ value: TaskPriority; label: string }> = [
+  { value: "urgent", label: "Urgent" },
   { value: "high", label: "High" },
   { value: "medium", label: "Medium" },
   { value: "low", label: "Low" },
+  { value: "no-priority", label: "No Priority" },
 ];
 
 const statusOptions: Array<{ value: TaskStatus; label: string }> = [
@@ -35,6 +37,7 @@ const statusOptions: Array<{ value: TaskStatus; label: string }> = [
   { value: "doing", label: "Doing" },
   { value: "completed", label: "Completed" },
   { value: "on-hold", label: "On Hold" },
+  { value: "backlog", label: "Backlog" },
 ];
 
 function toDateInputValue(value: string | null | undefined): string {

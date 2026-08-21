@@ -1,30 +1,19 @@
 "use client";
 
 import { Check, ChevronDown, MoonStar, SunMedium } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import {
-  useEffect,
-  useRef,
-  useState,
-} from "react";
-import {
-  applyColorMode,
   colorModeOptions,
-  getStoredColorMode,
   type ColorMode,
   setStoredColorMode,
 } from "./color-mode";
+import { useColorMode } from "./use-color-mode";
 
 export function ColorModeMenu() {
   const [isOpen, setIsOpen] = useState(false);
-  const [colorMode, setColorMode] = useState<ColorMode>(() =>
-    typeof window === "undefined" ? "light" : getStoredColorMode(),
-  );
+  const colorMode = useColorMode();
   const menuRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
-
-  useEffect(() => {
-    applyColorMode(colorMode);
-  }, [colorMode]);
 
   useEffect(() => {
     if (!isOpen) {
@@ -61,7 +50,6 @@ export function ColorModeMenu() {
   }, [isOpen]);
 
   const handleSelectColorMode = (nextMode: ColorMode) => {
-    setColorMode(nextMode);
     setStoredColorMode(nextMode);
     setIsOpen(false);
   };

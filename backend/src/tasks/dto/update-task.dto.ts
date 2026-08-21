@@ -32,6 +32,12 @@ export class UpdateTaskDto {
   @Transform(trimString)
   @IsOptional()
   @IsString()
+  @MaxLength(5000)
+  description?: string;
+
+  @Transform(trimString)
+  @IsOptional()
+  @IsString()
   @MaxLength(100)
   assigneeName?: string;
 
@@ -46,7 +52,43 @@ export class UpdateTaskDto {
   dueDate?: string;
 
   @IsOptional()
+  @IsDateString()
+  startDate?: string;
+
+  @IsOptional()
   @IsArray()
   @IsString({ each: true })
   labels?: string[];
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  teams?: string[];
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  resources?: string[];
+
+  @Transform(trimString)
+  @IsOptional()
+  @IsString()
+  @MaxLength(100)
+  reporterName?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(2048)
+  reporterAvatar?: string;
+
+  @Transform(trimString)
+  @IsOptional()
+  @IsString()
+  @MaxLength(100)
+  actorName?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(2048)
+  actorAvatar?: string;
 }

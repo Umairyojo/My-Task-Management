@@ -2,7 +2,8 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { getStoredGuestSession } from "./guest-session";
+import { useSession } from "next-auth/react";
+import { useGuestSession } from "./guest-session";
 
 function HomeRedirectSkeleton() {
   return <div className="min-h-dvh bg-background" />;
@@ -10,11 +11,17 @@ function HomeRedirectSkeleton() {
 
 export function HomeRedirect() {
   const router = useRouter();
-  const guestSession = getStoredGuestSession();
+  const { status } = useSession();
+  const guestSession = useGuestSession();
+  const isAuthorized = status === "authenticated" || guestSession !== null;
 
   useEffect(() => {
-    router.replace(guestSession ? "/tasks" : "/login");
-  }, [guestSession, router]);
+    if (status === "loading" && guestSession === null) {
+      return;
+    }
+
+    router.replace(isAuthorized ? "/tasks" : "/login");
+  }, [guestSession, isAuthorized, router, status]);
 
   return <HomeRedirectSkeleton />;
 }

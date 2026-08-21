@@ -11,9 +11,11 @@ import type {
 } from './project.types';
 
 const prismaTaskPriorityMap: Record<PrismaTaskPriority, ProjectPriority> = {
+  URGENT: 'urgent',
   HIGH: 'high',
   MEDIUM: 'medium',
   LOW: 'low',
+  NO_PRIORITY: 'no-priority',
 };
 
 export function toProjectResponse(project: PrismaProject): ProjectResponse {

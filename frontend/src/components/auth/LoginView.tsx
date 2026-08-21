@@ -2,111 +2,111 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { CheckCircle2, Sparkles } from "lucide-react";
+import { signIn, useSession } from "next-auth/react";
+import { GoogleMark } from "@/components/layout/app-icons";
 import {
   createGuestSession,
-  getStoredGuestSession,
   setStoredGuestSession,
+  useGuestSession,
 } from "./guest-session";
-
-function GoogleGlyph() {
-  return (
-    <span className="relative inline-flex h-4 w-4 overflow-hidden rounded-full border border-border bg-background">
-      <span className="absolute left-0 top-0 h-2 w-2 bg-[#4285F4]" />
-      <span className="absolute right-0 top-0 h-2 w-2 bg-[#EA4335]" />
-      <span className="absolute bottom-0 left-0 h-2 w-2 bg-[#FBBC05]" />
-      <span className="absolute bottom-0 right-0 h-2 w-2 bg-[#34A853]" />
-    </span>
-  );
-}
 
 function LoginSkeleton() {
   return (
     <div className="flex min-h-dvh items-center justify-center bg-background px-4 py-8">
-      <div className="h-[496px] w-full max-w-[488px] rounded-[20px] border border-border bg-surface/60" />
+      <div className="flex w-full flex-col items-center">
+        <div className="flex w-full justify-center">
+          <div className="h-7 w-28 rounded-full bg-surface/70 animate-pulse" />
+        </div>
+        <div className="mt-6 w-full max-w-[384px] rounded-[24px] border border-border bg-background p-6">
+          <div className="h-[202px] w-full rounded-[18px] bg-surface/60 animate-pulse" />
+        </div>
+        <div className="mt-4 h-12 w-full max-w-[384px] rounded-[4px] bg-surface/60 animate-pulse" />
+      </div>
     </div>
   );
 }
 
 export function LoginView() {
   const router = useRouter();
-  const guestSession = getStoredGuestSession();
+  const { status } = useSession();
+  const guestSession = useGuestSession();
+  const isAuthorized = status === "authenticated" || guestSession !== null;
 
   useEffect(() => {
-    if (guestSession) {
+    if (isAuthorized) {
       router.replace("/tasks");
     }
-  }, [guestSession, router]);
+  }, [isAuthorized, router]);
 
   const handleGuestLogin = () => {
     setStoredGuestSession(createGuestSession());
     router.replace("/tasks");
   };
 
-  if (guestSession) {
+  const handleGoogleLogin = () => {
+    void signIn("google", {
+      callbackUrl: "/tasks",
+    });
+  };
+
+  if (status === "loading" && !guestSession) {
+    return <LoginSkeleton />;
+  }
+
+  if (isAuthorized) {
     return <LoginSkeleton />;
   }
 
   return (
-    <div className="relative flex min-h-dvh items-center justify-center overflow-hidden bg-background px-4 py-8">
-      <div className="pointer-events-none absolute inset-0 opacity-80">
-        <div className="absolute -left-24 top-16 h-72 w-72 rounded-full bg-surface blur-3xl" />
-        <div className="absolute right-[-5rem] top-[-3rem] h-80 w-80 rounded-full bg-surface/70 blur-3xl" />
-        <div className="absolute bottom-[-4rem] left-1/2 h-96 w-96 -translate-x-1/2 rounded-full bg-background shadow-[0_0_120px_rgba(0,0,0,0.03)]" />
-      </div>
-
-      <div className="relative z-10 w-full max-w-[488px] rounded-[24px] border border-border bg-background p-5 shadow-[0_20px_48px_rgba(0,0,0,0.08)] sm:p-6">
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-[12px] border border-border bg-surface text-[13px] font-semibold text-foreground">
-            AS
-          </div>
-          <div>
-            <p className="text-[17px] font-semibold leading-5 text-foreground">
-              AbleSpace
+    <div className="flex min-h-dvh items-center justify-center bg-background px-4 py-8">
+      <div className="flex w-full flex-col items-center">
+        <div className="flex w-full justify-center">
+          <div className="flex items-center gap-2">
+            <img
+              src="/pyramid.svg"
+              alt=""
+              aria-hidden="true"
+              className="h-7 w-7 rounded-[8px]"
+            />
+            <p className="text-[12px] font-semibold leading-none tracking-[-0.02em] text-foreground">
+              Pyramid
             </p>
-            <p className="text-[12px] leading-4 text-muted">Task management workspace</p>
           </div>
         </div>
 
-        <div className="mt-10">
-          <div className="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-1 text-[11px] font-medium text-muted">
-            <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
-            Guest access
-          </div>
-
-          <h1 className="mt-5 text-[30px] font-semibold tracking-[-0.04em] text-foreground">
+        <div className="mt-6 w-full max-w-[384px] rounded-[24px] border border-border bg-background px-6 py-6 shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
+          <h1 className="text-center text-[18px] font-semibold leading-6 tracking-[-0.03em] text-foreground">
             Let&apos;s get back on track
           </h1>
-          <p className="mt-3 max-w-[36ch] text-[13px] leading-6 text-muted">
-            Enter the workspace as a guest to review tasks, projects, and the current
-            app layout.
+          <p className="mt-1 text-center text-[12px] leading-5 text-muted">
+            Enter your email below to login to your account.
           </p>
+
+          <div className="mt-4 space-y-2">
+            <button
+              type="button"
+              onClick={handleGuestLogin}
+              className="flex h-12 w-full items-center justify-center rounded-full bg-foreground px-4 text-[13px] font-medium text-background transition-colors hover:opacity-90"
+            >
+              Continue as Guest
+            </button>
+
+            <button
+              type="button"
+              onClick={handleGoogleLogin}
+              disabled={status === "loading"}
+              className="flex h-12 w-full items-center justify-center gap-2 rounded-full border border-border bg-background px-4 text-[13px] font-medium text-foreground transition-colors hover:bg-surface disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              <GoogleMark className="h-4 w-4" />
+              Login with Google
+            </button>
+          </div>
         </div>
 
-        <div className="mt-8 space-y-3">
-          <button
-            type="button"
-            onClick={handleGuestLogin}
-            className="flex h-10 w-full items-center justify-center gap-2 rounded-[10px] bg-foreground px-4 text-[13px] font-medium text-background transition-colors hover:opacity-90"
-          >
-            <CheckCircle2 className="h-4 w-4" aria-hidden="true" />
-            Continue as Guest
-          </button>
-
-          <button
-            type="button"
-            className="flex h-10 w-full items-center justify-center gap-3 rounded-[10px] border border-border bg-background px-4 text-[13px] font-medium text-foreground transition-colors hover:bg-surface"
-          >
-            <GoogleGlyph />
-            Continue with Google
-            <span className="text-[11px] font-normal text-muted">(visual only)</span>
-          </button>
-        </div>
-
-        <p className="mt-6 text-center text-[11px] leading-5 text-muted">
-          By continuing, you agree to the{" "}
+        <p className="mt-4 w-full max-w-[384px] text-center text-[11px] leading-4 text-muted">
+          By clicking continue, you agree to our{" "}
           <a href="#" className="underline underline-offset-2 hover:text-foreground">
-            Terms
+            Terms of Service
           </a>{" "}
           and{" "}
           <a href="#" className="underline underline-offset-2 hover:text-foreground">

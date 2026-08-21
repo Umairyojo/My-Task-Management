@@ -1,6 +1,7 @@
 export type ColorMode = "light" | "dark";
 
 export const COLOR_MODE_STORAGE_KEY = "task-management-color-mode";
+export const COLOR_MODE_CHANGE_EVENT = "task-management-color-mode-change";
 
 export const colorModeOptions: Array<{
   value: ColorMode;
@@ -43,6 +44,7 @@ export function applyColorMode(mode: ColorMode): void {
 export function setStoredColorMode(mode: ColorMode): void {
   window.localStorage.setItem(COLOR_MODE_STORAGE_KEY, mode);
   applyColorMode(mode);
+  window.dispatchEvent(new Event(COLOR_MODE_CHANGE_EVENT));
 }
 
 export function getColorModeBootstrapScript(): string {

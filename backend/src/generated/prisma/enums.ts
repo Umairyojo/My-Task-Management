@@ -13,16 +13,19 @@ export const TaskStatus = {
   TODO: 'TODO',
   DOING: 'DOING',
   COMPLETED: 'COMPLETED',
-  ON_HOLD: 'ON_HOLD'
+  ON_HOLD: 'ON_HOLD',
+  BACKLOG: 'BACKLOG'
 } as const
 
 export type TaskStatus = (typeof TaskStatus)[keyof typeof TaskStatus]
 
 
 export const TaskPriority = {
+  URGENT: 'URGENT',
   HIGH: 'HIGH',
   MEDIUM: 'MEDIUM',
-  LOW: 'LOW'
+  LOW: 'LOW',
+  NO_PRIORITY: 'NO_PRIORITY'
 } as const
 
 export type TaskPriority = (typeof TaskPriority)[keyof typeof TaskPriority]

@@ -39,7 +39,7 @@ export function TaskRow({
       </td>
       {fieldVisibility.priority ? (
         <td className="px-4 py-2 align-middle">
-          <PriorityIndicator priority={task.priority} />
+          <PriorityIndicator priority={task.priority} variant="inline" />
         </td>
       ) : null}
       {fieldVisibility.members ? (

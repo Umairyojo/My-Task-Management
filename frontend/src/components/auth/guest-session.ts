@@ -1,3 +1,5 @@
+import { useSyncExternalStore } from "react";
+
 export interface GuestSession {
   id: string;
   email: string;
@@ -139,4 +141,25 @@ export function clearStoredGuestSession(): void {
   cachedGuestSessionRaw = null;
   cachedGuestSessionSnapshot = null;
   window.dispatchEvent(new Event(GUEST_SESSION_CHANGE_EVENT));
+}
+
+function subscribe(callback: () => void): () => void {
+  const handleChange = () => {
+    cachedGuestSessionRaw = undefined;
+    callback();
+  };
+
+  window.addEventListener(GUEST_SESSION_CHANGE_EVENT, handleChange);
+
+  return () => {
+    window.removeEventListener(GUEST_SESSION_CHANGE_EVENT, handleChange);
+  };
+}
+
+export function useGuestSession(): GuestSession | null {
+  return useSyncExternalStore(
+    subscribe,
+    getStoredGuestSession,
+    () => null,
+  );
 }

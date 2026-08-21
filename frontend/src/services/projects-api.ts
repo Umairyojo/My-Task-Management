@@ -34,9 +34,11 @@ function isProject(value: unknown): value is Project {
     isRecord(value) &&
     typeof value.id === "string" &&
     typeof value.name === "string" &&
-    (value.priority === "high" ||
+    (value.priority === "urgent" ||
+      value.priority === "high" ||
       value.priority === "medium" ||
-      value.priority === "low") &&
+      value.priority === "low" ||
+      value.priority === "no-priority") &&
     (value.leadName === null || typeof value.leadName === "string") &&
     (value.dueDate === null || typeof value.dueDate === "string") &&
     typeof value.createdAt === "string" &&

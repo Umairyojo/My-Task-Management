@@ -9,5 +9,8 @@
  * 🟢 You can import this file directly.
  */
 export type * from './models/Task.js'
+export type * from './models/Subtask.js'
+export type * from './models/TaskComment.js'
+export type * from './models/TaskActivity.js'
 export type * from './models/Project.js'
 export type * from './commonInputTypes.js'

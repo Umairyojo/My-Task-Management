@@ -30,7 +30,7 @@ export function ProjectRow({
         </Link>
       </td>
       <td className="px-4 py-2 align-middle">
-        <PriorityIndicator priority={project.priority} />
+        <PriorityIndicator priority={project.priority} variant="inline" />
       </td>
       <td className="px-4 py-2 align-middle">
         <span className="block truncate text-[12px] leading-4 text-muted">

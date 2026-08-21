@@ -1,4 +1,4 @@
-import { TaskDetailView } from "@/components/tasks/TaskDetailView";
+import { TaskDetailPageClient } from "@/components/tasks/TaskDetailPageClient";
 
 interface TaskDetailPageProps {
   params: Promise<{
@@ -9,5 +9,5 @@ interface TaskDetailPageProps {
 export default async function TaskDetailPage({ params }: TaskDetailPageProps) {
   const { id } = await params;
 
-  return <TaskDetailView taskId={id} />;
+  return <TaskDetailPageClient taskId={id} />;
 }

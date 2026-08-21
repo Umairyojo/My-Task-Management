@@ -49,9 +49,9 @@ export function TaskListView({
                 fieldVisibility={fieldVisibility}
                 showAddTask={showAddTask}
                 showActions={showActions}
-            />
-          );
-        })}
+              />
+            );
+          })}
         </div>
       </div>
     </div>
