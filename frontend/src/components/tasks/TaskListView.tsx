@@ -3,7 +3,7 @@
 import type { Task, TaskStatus } from "./types";
 import type { TaskFieldVisibility } from "./task-fields";
 import { TaskSection } from "./TaskSection";
-import { taskListSections } from "./task-sections";
+import { taskListSections, taskMatchesSection } from "./task-sections";
 
 interface TaskListViewProps {
   tasks: Task[];
@@ -31,7 +31,9 @@ export function TaskListView({
       <div className="min-h-0 min-w-0 overflow-x-auto pb-1">
         <div className="flex w-full min-w-[760px] flex-col gap-2.5">
           {taskListSections.map((section) => {
-            const sectionTasks = tasks.filter((task) => task.status === section.key);
+            const sectionTasks = tasks.filter((task) =>
+              taskMatchesSection(task.status, section.key),
+            );
 
             if (hideEmptySections && sectionTasks.length === 0) {
               return null;

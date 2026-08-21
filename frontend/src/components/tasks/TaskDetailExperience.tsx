@@ -43,6 +43,7 @@ import {
   updateTaskDetail,
 } from "@/services/tasks-api";
 import { MemberAvatar } from "./MemberAvatar";
+import { getWorkspaceTaskStatus } from "./task-sections";
 import type {
   Subtask,
   TaskActivity,
@@ -54,10 +55,9 @@ import type {
 
 const statusOptions: Array<{ value: TaskStatus; label: string; className: string }> = [
   { value: "todo", label: "To Do", className: "text-zinc-500" },
+  { value: "on-hold", label: "On Hold", className: "text-red-500" },
   { value: "doing", label: "Doing", className: "text-amber-600" },
   { value: "completed", label: "Completed", className: "text-emerald-600" },
-  { value: "on-hold", label: "On Hold", className: "text-red-500" },
-  { value: "backlog", label: "Backlog", className: "text-zinc-400" },
 ];
 
 const priorityOptions: Array<{ value: TaskPriority; label: string; className: string }> = [
@@ -79,7 +79,9 @@ function getInitials(name: string): string {
 }
 
 function labelForStatus(status: TaskStatus): string {
-  return statusOptions.find((option) => option.value === status)?.label ?? status;
+  const workspaceStatus = getWorkspaceTaskStatus(status);
+
+  return statusOptions.find((option) => option.value === workspaceStatus)?.label ?? workspaceStatus;
 }
 
 function labelForPriority(priority: TaskPriority): string {
@@ -156,7 +158,9 @@ function PriorityBars({ priority }: { priority: TaskPriority }) {
 }
 
 function StatusMark({ status }: { status: TaskStatus }) {
-  const option = statusOptions.find((item) => item.value === status);
+  const option = statusOptions.find(
+    (item) => item.value === getWorkspaceTaskStatus(status),
+  );
   return <CircleDot className={`h-3.5 w-3.5 ${option?.className ?? "text-muted"}`} aria-hidden="true" />;
 }
 
@@ -507,7 +511,7 @@ export function TaskDetailExperience({ initialTask }: { initialTask: TaskDetail 
         <aside className="min-w-0 space-y-4 xl:sticky xl:top-4 xl:self-start">
           <CollapsibleCard title="Details" open={isDetailsOpen} onToggle={() => setIsDetailsOpen((current) => !current)} action={<div className="flex items-center gap-1"><button type="button" className="inline-flex h-7 w-7 items-center justify-center rounded-[5px] text-muted hover:bg-surface"><Plus className="h-4 w-4" /></button><button type="button" className="inline-flex h-7 w-7 items-center justify-center rounded-[5px] text-muted hover:bg-surface"><Settings2 className="h-4 w-4" /></button></div>}>
             <div className="mt-2 space-y-3.5">
-              <DetailRow label="Status"><DetailValueButton buttonRef={statusButtonRef} onClick={() => setActivePopover("status")}><StatusMark status={task.status} /><span className={statusOptions.find((option) => option.value === task.status)?.className}>{labelForStatus(task.status)}</span></DetailValueButton></DetailRow>
+              <DetailRow label="Status"><DetailValueButton buttonRef={statusButtonRef} onClick={() => setActivePopover("status")}><StatusMark status={task.status} /><span className={statusOptions.find((option) => option.value === getWorkspaceTaskStatus(task.status))?.className}>{labelForStatus(task.status)}</span></DetailValueButton></DetailRow>
               <DetailRow label="Priority"><DetailValueButton buttonRef={priorityButtonRef} onClick={() => setActivePopover("priority")}><PriorityBars priority={task.priority} /><span className={priorityOptions.find((option) => option.value === task.priority)?.className}>{labelForPriority(task.priority)}</span></DetailValueButton></DetailRow>
               <DetailRow label="Members"><button type="button" onClick={() => void persist({ assigneeName: profile.fullName, assigneeInitials: profile.initials, ...actor })} className="inline-flex h-8 items-center gap-2 rounded-[7px] px-2 text-[13px] hover:bg-surface"><Avatar alt={assigneeName} initials={assigneeInitials} sizeClassName="h-6 w-6" textClassName="text-[10px]" /><span>{assigneeName}</span><UserPlus className="h-4 w-4 text-muted" /></button></DetailRow>
               <DetailRow label="Dates"><div className="flex min-w-0 flex-wrap items-center gap-1"><button ref={startButtonRef} type="button" onClick={() => setActivePopover("start")} className="h-8 max-w-[132px] truncate rounded-full border border-border px-3 text-[12px] text-muted hover:bg-surface">{task.startDate ? formatDate(task.startDate) : "+ Start"}</button><ChevronRight className="h-3.5 w-3.5 text-muted" /><button ref={dueButtonRef} type="button" onClick={() => setActivePopover("due")} className="h-8 max-w-[132px] truncate rounded-full border border-border px-3 text-[12px] text-foreground hover:bg-surface">{task.dueDate ? formatDate(task.dueDate) : "+ Due"}</button></div></DetailRow>
@@ -520,7 +524,7 @@ export function TaskDetailExperience({ initialTask }: { initialTask: TaskDetail 
         </aside>
       </div>
 
-      <FloatingPopover open={activePopover === "status"} anchorRef={statusButtonRef} onClose={() => setActivePopover(null)} width={250}><div className="p-1">{statusOptions.map((option) => <button key={option.value} type="button" onClick={() => { void persist({ status: option.value, ...actor }); setActivePopover(null); }} className={`flex h-10 w-full items-center gap-2 rounded-[7px] px-2 text-left text-[13px] transition-colors hover:bg-surface ${task.status === option.value ? "bg-surface" : ""}`}><StatusMark status={option.value} /><span className={`flex-1 ${option.className}`}>{option.label}</span>{task.status === option.value ? <Check className="h-4 w-4" /> : null}</button>)}</div></FloatingPopover>
+      <FloatingPopover open={activePopover === "status"} anchorRef={statusButtonRef} onClose={() => setActivePopover(null)} width={250}><div className="p-1">{statusOptions.map((option) => <button key={option.value} type="button" onClick={() => { void persist({ status: option.value, ...actor }); setActivePopover(null); }} className={`flex h-10 w-full items-center gap-2 rounded-[7px] px-2 text-left text-[13px] transition-colors hover:bg-surface ${getWorkspaceTaskStatus(task.status) === option.value ? "bg-surface" : ""}`}><StatusMark status={option.value} /><span className={`flex-1 ${option.className}`}>{option.label}</span>{getWorkspaceTaskStatus(task.status) === option.value ? <Check className="h-4 w-4" /> : null}</button>)}</div></FloatingPopover>
       <FloatingPopover open={activePopover === "priority"} anchorRef={priorityButtonRef} onClose={() => setActivePopover(null)} width={250}><div className="p-1">{priorityOptions.map((option) => <button key={option.value} type="button" onClick={() => { void persist({ priority: option.value, ...actor }); setActivePopover(null); }} className={`flex h-10 w-full items-center gap-2 rounded-[7px] px-2 text-left text-[13px] transition-colors hover:bg-surface ${task.priority === option.value ? "bg-surface" : ""}`}><PriorityBars priority={option.value} /><span className={`flex-1 ${option.className}`}>{option.label}</span>{task.priority === option.value ? <Check className="h-4 w-4" /> : null}</button>)}</div></FloatingPopover>
       <FloatingPopover open={activePopover === "start"} anchorRef={startButtonRef} onClose={() => setActivePopover(null)} width={320}><CalendarPicker value={task.startDate} onSelect={(startDate) => { void persist({ startDate, ...actor }); setActivePopover(null); }} /></FloatingPopover>
       <FloatingPopover open={activePopover === "due"} anchorRef={dueButtonRef} onClose={() => setActivePopover(null)} width={320}><CalendarPicker value={task.dueDate} onSelect={(dueDate) => { void persist({ dueDate, ...actor }); setActivePopover(null); }} /></FloatingPopover>

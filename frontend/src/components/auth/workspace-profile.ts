@@ -30,6 +30,12 @@ const DEFAULT_WORKSPACE_EMAIL = "guest@ablespace.local";
 const DEFAULT_GUEST_AVATAR_SRC = "/guest-avatar.svg";
 const DEFAULT_WORKSPACE_PROFILE_BASE = {
   title: "Designer",
+  username: "guest-user",
+};
+const LEGACY_DEFAULT_GUEST_PROFILE = {
+  fullName: "Dexter",
+  initials: "D",
+  title: "Designer",
   username: "Dexuser",
 };
 
@@ -76,6 +82,16 @@ function normalizeStoredEmail(email: string): string {
 
 function getWorkspaceProfileStorageKey(profileKey: string): string {
   return `${WORKSPACE_PROFILE_STORAGE_KEY_PREFIX}:${profileKey}`;
+}
+
+function isLegacyDefaultGuestProfile(profile: WorkspaceProfile): boolean {
+  return (
+    profile.authType === "guest" &&
+    profile.fullName === LEGACY_DEFAULT_GUEST_PROFILE.fullName &&
+    profile.initials === LEGACY_DEFAULT_GUEST_PROFILE.initials &&
+    profile.title === LEGACY_DEFAULT_GUEST_PROFILE.title &&
+    profile.username === LEGACY_DEFAULT_GUEST_PROFILE.username
+  );
 }
 
 function createDefaultProfile(currentUser: CurrentUserIdentity | null): WorkspaceProfile {
@@ -197,6 +213,17 @@ export function getStoredWorkspaceProfile(
     const nextProfile = parseWorkspaceProfile(rawValue);
 
     if (nextProfile) {
+      if (isLegacyDefaultGuestProfile(nextProfile)) {
+        const migratedProfile = createDefaultProfile(currentUser);
+        const migratedRaw = JSON.stringify(migratedProfile);
+
+        window.localStorage.setItem(storageKey, migratedRaw);
+        cachedWorkspaceProfileKey = storageKey;
+        cachedWorkspaceProfileRaw = migratedRaw;
+        cachedWorkspaceProfileSnapshot = migratedProfile;
+        return migratedProfile;
+      }
+
       cachedWorkspaceProfileKey = storageKey;
       cachedWorkspaceProfileRaw = rawValue;
       cachedWorkspaceProfileSnapshot = nextProfile;

@@ -14,7 +14,7 @@ import { TaskFormDialog, type TaskFormValues } from "./TaskFormDialog";
 import { MemberAvatar } from "./MemberAvatar";
 import { PriorityIndicator } from "./PriorityIndicator";
 import { formatTaskDate } from "./task-date";
-import { taskBoardSections } from "./task-sections";
+import { getWorkspaceTaskStatus, taskBoardSections } from "./task-sections";
 import type { Task } from "./types";
 import {
   TaskApiError,
@@ -60,7 +60,9 @@ function formatDateTime(value: string | null): string {
 }
 
 function getStatusLabel(status: Task["status"]): string {
-  return taskBoardSections.find((section) => section.key === status)?.title ?? status;
+  const workspaceStatus = getWorkspaceTaskStatus(status);
+
+  return taskBoardSections.find((section) => section.key === workspaceStatus)?.title ?? workspaceStatus;
 }
 
 function DetailCard({

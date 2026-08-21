@@ -1,4 +1,5 @@
 import type { Task, TaskPriority, TaskStatus } from "./types";
+import { getWorkspaceTaskStatus } from "./task-sections";
 
 export type DueDateFilter = "all" | "overdue" | "today" | "this-week" | "no-date";
 
@@ -28,10 +29,9 @@ export const defaultTaskFilters: TaskFilters = {
 
 export const statusFilterOptions: Array<{ value: TaskStatus; label: string }> = [
   { value: "todo", label: "To Do" },
+  { value: "on-hold", label: "On Hold" },
   { value: "doing", label: "Doing" },
   { value: "completed", label: "Completed" },
-  { value: "on-hold", label: "On Hold" },
-  { value: "backlog", label: "Backlog" },
 ];
 
 export const priorityFilterOptions: Array<{ value: TaskPriority; label: string }> = [
@@ -173,7 +173,7 @@ export function taskMatchesTaskFilters(
 ): boolean {
   if (
     filters.statuses.length > 0 &&
-    !filters.statuses.includes(task.status)
+    !filters.statuses.includes(getWorkspaceTaskStatus(task.status))
   ) {
     return false;
   }

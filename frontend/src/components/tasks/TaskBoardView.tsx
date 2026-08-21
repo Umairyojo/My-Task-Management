@@ -3,7 +3,7 @@
 import type { Task, TaskStatus } from "./types";
 import type { TaskFieldVisibility } from "./task-fields";
 import { TaskBoardColumn } from "./TaskBoardColumn";
-import { taskBoardSections } from "./task-sections";
+import { taskBoardSections, taskMatchesSection } from "./task-sections";
 
 interface TaskBoardViewProps {
   tasks: Task[];
@@ -34,7 +34,9 @@ export function TaskBoardView({
     <div className="min-h-0 min-w-0 overflow-x-auto overscroll-x-contain pb-1">
       <div className="flex w-max min-w-full gap-2.5">
         {taskBoardSections.map((section) => {
-          const sectionTasks = tasks.filter((task) => task.status === section.key);
+          const sectionTasks = tasks.filter((task) =>
+            taskMatchesSection(task.status, section.key),
+          );
 
           if (hideEmptySections && sectionTasks.length === 0) {
             return null;

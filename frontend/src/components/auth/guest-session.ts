@@ -13,12 +13,15 @@ export interface GuestIdentity {
 }
 
 export const DEFAULT_GUEST_IDENTITY: GuestIdentity = {
-  name: "Dexter",
-  initials: "D",
+  name: "Guest User",
+  initials: "GU",
 };
 
 export const GUEST_SESSION_STORAGE_KEY = "task-management-guest-session";
 export const GUEST_SESSION_CHANGE_EVENT = "task-management-guest-session-change";
+
+const LEGACY_DEFAULT_GUEST_NAME = "Dexter";
+const LEGACY_DEFAULT_GUEST_INITIALS = "D";
 
 let cachedGuestSessionRaw: string | null | undefined = undefined;
 let cachedGuestSessionSnapshot: GuestSession | null = null;
@@ -94,14 +97,27 @@ export function getStoredGuestSession(): GuestSession | null {
       parsed.name.trim().length > 0 &&
       parsed.initials.trim().length > 0
     ) {
+      const isLegacyDefaultGuest =
+        parsed.name.trim() === LEGACY_DEFAULT_GUEST_NAME &&
+        parsed.initials.trim().toUpperCase() === LEGACY_DEFAULT_GUEST_INITIALS;
       const nextSession: GuestSession = {
         id: parsed.id.trim(),
         email: parsed.email.trim(),
-        name: parsed.name.trim(),
-        initials: parsed.initials.trim().toUpperCase().slice(0, 2),
+        name: isLegacyDefaultGuest
+          ? DEFAULT_GUEST_IDENTITY.name
+          : parsed.name.trim(),
+        initials: isLegacyDefaultGuest
+          ? DEFAULT_GUEST_IDENTITY.initials
+          : parsed.initials.trim().toUpperCase().slice(0, 2),
       };
 
-      cachedGuestSessionRaw = rawValue;
+      const nextRawValue = JSON.stringify(nextSession);
+
+      if (isLegacyDefaultGuest) {
+        window.sessionStorage.setItem(GUEST_SESSION_STORAGE_KEY, nextRawValue);
+      }
+
+      cachedGuestSessionRaw = nextRawValue;
       cachedGuestSessionSnapshot = nextSession;
 
       return nextSession;

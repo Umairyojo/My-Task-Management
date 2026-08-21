@@ -326,7 +326,7 @@ export function ProfileView() {
                   <InputPill
                     value={formValues.fullName}
                     onChange={handleChange("fullName")}
-                    placeholder="Dexter"
+                    placeholder="Guest User"
                   />
                 ) : (
                   <ProfileValue value={profile.fullName} />
@@ -360,7 +360,7 @@ export function ProfileView() {
                   <InputPill
                     value={formValues.username}
                     onChange={handleChange("username")}
-                    placeholder="Dexuser"
+                    placeholder="guest-user"
                   />
                 ) : (
                   <ProfileValue value={profile.username} />

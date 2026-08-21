@@ -4,6 +4,7 @@ import { createPortal } from "react-dom";
 import type { FormEvent } from "react";
 import { useEffect, useState } from "react";
 import type { TaskPriority, TaskStatus, Task } from "./types";
+import { getWorkspaceTaskStatus } from "./task-sections";
 
 export interface TaskFormValues {
   title: string;
@@ -34,10 +35,9 @@ const priorityOptions: Array<{ value: TaskPriority; label: string }> = [
 
 const statusOptions: Array<{ value: TaskStatus; label: string }> = [
   { value: "todo", label: "To Do" },
+  { value: "on-hold", label: "On Hold" },
   { value: "doing", label: "Doing" },
   { value: "completed", label: "Completed" },
-  { value: "on-hold", label: "On Hold" },
-  { value: "backlog", label: "Backlog" },
 ];
 
 function toDateInputValue(value: string | null | undefined): string {
@@ -60,7 +60,7 @@ function createInitialValues(
 ): TaskFormValues {
   return {
     title: task?.title ?? "",
-    status: task?.status ?? defaultStatus,
+    status: getWorkspaceTaskStatus(task?.status ?? defaultStatus),
     priority: task?.priority ?? "medium",
     assigneeName: task?.assigneeName ?? "",
     assigneeInitials: task?.assigneeInitials ?? "",
